@@ -51,3 +51,79 @@
 .status-offline {
   background-color: #8a8886;
 }
+
+
+
+/* Add this content to your main CSS file (e.g., src/index.css)
+  Make sure you have Tailwind CSS installed and configured.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Define the animation keyframes for the sliding effect.
+  We will apply these using Tailwind classes in the React component.
+*/
+@layer utilities {
+  @keyframes slide-out-left {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-out-right {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Create utility classes for these animations */
+  .animate-slide-out-left {
+    animation: slide-out-left 0.3s ease-in-out forwards;
+  }
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-in-out forwards;
+  }
+  .animate-slide-out-right {
+    animation: slide-out-right 0.3s ease-in-out forwards;
+  }
+  .animate-slide-in-left {
+    animation: slide-in-left 0.3s ease-in-out forwards;
+  }
+  /* Fallback for the initial load 'slide-in' */
+  .animate-slide-in {
+     animation: slide-in-right 0.3s ease-in-out forwards;
+  }
+}
