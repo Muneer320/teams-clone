@@ -71,11 +71,13 @@ src/
 ## Key Components
 
 ### Authentication Flow
+
 1. **Register** - Email, name, password signup
 2. **OTP Verification** - 6-digit code (dummy: 123456), auto-submits when complete
 3. **Login** - Email/password with JWT token storage
 
 ### Chat Features
+
 - Real-time message delivery
 - Typing indicators (shows "User is typing...")
 - Message reactions (emoji responses)
@@ -83,6 +85,7 @@ src/
 - Channel-based conversations
 
 ### Video Calls
+
 - WebRTC peer-to-peer connections
 - Audio on/off toggle
 - Video on/off toggle

@@ -16,6 +16,7 @@ pip install -r requirements.txt
 ```
 
 **Requirements:**
+
 - `requests` - HTTP client for API calls
 - `numpy` - Numerical operations
 - `matplotlib` (optional) - Visualization and plotting
@@ -25,15 +26,19 @@ pip install -r requirements.txt
 ### 1. Run Demo Tools
 
 **Interactive CLI Demo:**
+
 ```bash
 python ../rl_demo/run_demo.py
 ```
+
 Runs 10 episodes with rule-based agent, shows live progress and final statistics.
 
 **Visualize Results:**
+
 ```bash
 python ../rl_demo/plot_results.py
 ```
+
 Generates reward curves and performance charts.
 
 ### 2. Run Rule-Based Agent
@@ -43,6 +48,7 @@ python task_agent.py
 ```
 
 This agent uses task-specific policies:
+
 - **Respond to Mentions**: React quickly to @mentions
 - **Schedule Meetings**: Accept invitations, coordinate schedules
 - **Manage Files**: Review and organize file uploads
@@ -50,6 +56,7 @@ This agent uses task-specific policies:
 - **Help Requests**: Prioritize urgent help requests
 
 **Expected Performance:**
+
 - Avg Reward: 0.10-0.15 per step
 - Mention Response Rate: 95%+
 - Avg Response Time: <3 steps
@@ -63,12 +70,14 @@ jupyter notebook ../notebooks/RL_Train.ipynb
 ```
 
 The notebook includes:
+
 - Gym wrapper for Stable-Baselines3 compatibility
 - PPO training with customizable hyperparameters
 - Training progress visualization
 - Model saving and evaluation
 
 **Example Training:**
+
 ```python
 from stable_baselines3 import PPO
 from teams_env_wrapper import TeamsGymEnv
@@ -89,7 +98,7 @@ from teams_env_client import TeamsEnvClient
 class MyAgent:
     def __init__(self, base_url='http://localhost:3001'):
         self.client = TeamsEnvClient(base_url)
-    
+
     def select_action(self, state):
         """Your agent logic here"""
         return {
@@ -99,20 +108,20 @@ class MyAgent:
                 'content': 'Hello from my agent!'
             }
         }
-    
+
     def run_episode(self):
         state = self.client.reset()
         total_reward = 0
         done = False
-        
+
         while not done:
             action = self.select_action(state)
             result = self.client.step(action)
-            
+
             state = result['state']
             total_reward += result['reward']
             done = result['done']
-        
+
         return total_reward
 
 # Run agent

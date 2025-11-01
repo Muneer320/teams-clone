@@ -75,6 +75,7 @@ NODE_ENV=development
 ## Database Schema
 
 SQLite database includes tables for:
+
 - `users` - User accounts with hashed passwords
 - `channels` - Team channels
 - `messages` - Chat messages with reactions
@@ -87,6 +88,7 @@ Database auto-creates on first run. No migrations needed.
 ## Socket.IO Events
 
 **Client → Server:**
+
 - `join_channel` - Join channel room
 - `send_message` - Send message
 - `typing` - Typing indicator
@@ -95,6 +97,7 @@ Database auto-creates on first run. No migrations needed.
 - `webrtc-offer`, `webrtc-answer`, `webrtc-ice-candidate` - WebRTC signaling
 
 **Server → Client:**
+
 - `new_message` - New message broadcast
 - `user_typing` - Typing indicator
 - `presence_update` - User status change
