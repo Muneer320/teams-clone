@@ -56,12 +56,12 @@
 
 ## Testing Summary
 
-| API            | Total | Tested | Status |
-| -------------- | ----- | ------ | ------ |
-| RL Environment | 8     | 8      | ✅ Functional |
-| Calendar       | 20    | 0      | ⚠️ Manual testing only |
-| Calls          | 13    | 0      | ⚠️ Manual testing only |
-| **Total**      | **41** | **8**  | **🔄 In Progress** |
+| API            | Total  | Tested | Status                 |
+| -------------- | ------ | ------ | ---------------------- |
+| RL Environment | 8      | 8      | ✅ Functional          |
+| Calendar       | 20     | 0      | ⚠️ Manual testing only |
+| Calls          | 13     | 0      | ⚠️ Manual testing only |
+| **Total**      | **41** | **8**  | **🔄 In Progress**     |
 
 ## Related Documentation
 

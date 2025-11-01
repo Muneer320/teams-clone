@@ -31,6 +31,7 @@ npm install
 ```
 
 **Required dependencies will install automatically:**
+
 - express, socket.io, sqlite3, sqlite, bcryptjs, jsonwebtoken, etc.
 
 **Run development server:**
@@ -94,6 +95,7 @@ npm run dev
 App runs on: `http://localhost:5173`
 
 **Current Features:**
+
 - ✅ Microsoft-style authentication UI with OTP
 - ✅ Multi-tab interface (Chat, Calendar, Calls, RL Test)
 - ✅ Real-time chat with Socket.IO
