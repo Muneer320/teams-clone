@@ -332,21 +332,6 @@ If you use TeamsClone-RL in your research, please cite:
 - WebRTC video calls functional but peer-to-peer connections need improvement
 - Auth system uses dummy OTP (123456) for demo purposes
 
-## 🚧 Future Work
-
-- [x] Neural network agents (PPO implementation with Stable-Baselines3) ✅
-- [x] Integration with Stable-Baselines3 ✅
-- [x] Calendar scheduling system ✅
-- [x] Video calling with WebRTC ✅
-- [x] Authentication system with OTP ✅
-- [ ] Multi-agent environments with competitive/cooperative scenarios
-- [ ] Real-time training visualization dashboard
-- [ ] Custom task creation API for dynamic task generation
-- [ ] Curriculum learning and meta-learning experiments
-- [ ] MySQL/PostgreSQL integration for production
-- [ ] File sharing and attachment system
-- [ ] Advanced call features (recording, transcription)
-
 ## 🎯 Key Metrics & Performance
 
 **Current Baseline Agent Performance:**
