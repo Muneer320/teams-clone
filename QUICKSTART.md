@@ -30,9 +30,14 @@ cd backend
 npm install
 ```
 
+**Required dependencies will install automatically:**
+- express, socket.io, sqlite3, sqlite, bcryptjs, jsonwebtoken, etc.
+
 **Run development server:**
 
 ```bash
+npm start
+# or for auto-reload during development:
 npm run dev
 ```
 
@@ -42,22 +47,32 @@ Server runs on: `http://localhost:3001`
 
 ```bash
 curl http://localhost:3001/health
+# Should return: {"status":"ok","timestamp":...}
 ```
+
+**Database Setup:**
+
+SQLite database is auto-created in `backend/data/teams_clone.db` on first run. No manual setup needed!
 
 **Your tasks:**
 
-- [ ] Extend environment actions in `src/models/environment.js`
-- [ ] Add more reward logic
-- [ ] Implement message persistence (database)
-- [ ] Add authentication
-- [ ] Create more Socket.IO events
+- [ ] Extend environment actions in `src/services/envService.js`
+- [ ] Add more task types to the RL environment
+- [ ] Enhance reward logic for better agent training
+- [ ] Switch to MySQL/PostgreSQL for production (optional)
+- [ ] Add more Socket.IO events for real-time features
+- [ ] Implement file upload/attachment system
 
 **Key files:**
 
-- `src/server.js` - Main server
-- `src/routes/env.js` - RL API endpoints
-- `src/models/environment.js` - Environment logic
-- `src/socket/handlers.js` - Real-time events
+- `src/server.js` - Main server with all routes
+- `src/routes/env.js` - RL API endpoints (9 endpoints)
+- `src/routes/calendar.js` - Calendar API (20 endpoints)
+- `src/routes/calls.js` - Video call API (13 endpoints)
+- `src/services/envService.js` - Environment business logic
+- `src/models/database.js` - SQLite connection
+- `src/socket/handlers.js` - Chat & presence events
+- `src/socket/callHandlers.js` - Video call signaling
 
 ---
 
@@ -78,19 +93,33 @@ npm run dev
 
 App runs on: `http://localhost:5173`
 
+**Current Features:**
+- ✅ Microsoft-style authentication UI with OTP
+- ✅ Multi-tab interface (Chat, Calendar, Calls, RL Test)
+- ✅ Real-time chat with Socket.IO
+- ✅ WebRTC video calling
+- ✅ Calendar/meeting interface
+- ✅ User selector for testing
+
 **Your tasks:**
 
-- [ ] Improve UI/UX to match Teams more closely
-- [ ] Add more components (calendar, files, etc.)
+- [ ] Add dark mode toggle
+- [ ] Improve video call UI (grid layout for multiple participants)
+- [ ] Add file upload and attachment preview
 - [ ] Implement message reactions UI
 - [ ] Add typing indicators
-- [ ] Create call modal UI
-- [ ] Add dark mode
+- [ ] Create notification system
+- [ ] Add user profiles and settings page
+- [ ] Improve mobile responsiveness
 
 **Key files:**
 
-- `src/App.jsx` - Main app logic
-- `src/components/` - All UI components
+- `src/App.jsx` - Main app with tab navigation
+- `src/components/AuthFlow.jsx` - Complete auth flow (sign in, register, OTP)
+- `src/components/ChatTab.jsx` - Chat interface
+- `src/components/CallsTab.jsx` - Video calls with WebRTC
+- `src/components/CalendarTab.jsx` - Calendar UI
+- `src/components/RLTestTab.jsx` - RL environment testing interface
 - `tailwind.config.js` - Styling configuration
 
 ---
@@ -101,44 +130,68 @@ App runs on: `http://localhost:5173`
 
 ```bash
 cd python_agent
-pip install -r requirements.txt
+pip install requests matplotlib numpy
+# Optional for training:
+pip install stable-baselines3 gym
 ```
 
-**Test random agent:**
+**Test the environment:**
 
 ```bash
-python agents/random_agent.py
+python test.py
 ```
 
-**Test rule-based agent:**
+**Run the rule-based agent:**
 
 ```bash
-python agents/rule_based_agent.py
+python agent.py
 ```
+
+**Try the interactive demo:**
+
+```bash
+python demo.py
+```
+
+**Quick CLI demo:**
+
+```bash
+cd ../rl_demo
+python run_demo.py --task greeting_response
+```
+
+**Train a PPO agent (Jupyter Notebook):**
+
+Open `notebooks/RL_Train.ipynb` in Jupyter Lab or VS Code
 
 **Your tasks:**
 
-- [ ] Implement DQN agent in `agents/rl_agent.py`
-- [ ] Add state encoding (use BERT for messages)
-- [ ] Implement training loop
-- [ ] Add replay buffer
-- [ ] Create evaluation script
-- [ ] Tune hyperparameters
-- [ ] Try PPO, A3C, or other algorithms
+- [ ] Tune PPO hyperparameters for better performance
+- [ ] Try different RL algorithms (DQN, A2C, SAC)
+- [ ] Implement LSTM policy for context awareness
+- [ ] Add state encoding with BERT for message understanding
+- [ ] Create curriculum learning pipeline
+- [ ] Implement multi-agent competitive scenarios
+- [ ] Add custom reward shaping experiments
+- [ ] Create real-time training dashboard
 
 **Key files:**
 
-- `rl_client.py` - Environment client
-- `agents/rl_agent.py` - Your RL implementation
-- `agents/random_agent.py` - Random baseline
-- `agents/rule_based_agent.py` - Rule-based baseline
+- `client.py` - Environment HTTP client with all endpoints
+- `agent.py` - Rule-based agent with task-specific policies
+- `test.py` - Comprehensive test suite (40+ tests)
+- `demo.py` - Interactive CLI demo
+- `../rl_demo/run_demo.py` - Quick episode runner
+- `../rl_demo/plot_results.py` - Visualization tool
+- `../notebooks/RL_Train.ipynb` - PPO training notebook
 
 **Suggested libraries:**
 
-- PyTorch / TensorFlow
-- Stable-Baselines3
-- RLlib
-- Transformers (for message embeddings)
+- **Stable-Baselines3** (PPO, DQN, A2C, SAC)
+- **RLlib** (advanced distributed RL)
+- **PyTorch / TensorFlow** (custom networks)
+- **Transformers** (BERT for message embeddings)
+- **Weights & Biases** (experiment tracking)
 
 ---
 

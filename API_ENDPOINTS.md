@@ -56,9 +56,17 @@
 
 ## Testing Summary
 
-| API            | Total  | Tested | Working | Issues |
-| -------------- | ------ | ------ | ------- | ------ |
-| RL Environment | 9      | ⏳     | ⏳      | ⏳     |
-| Calendar       | 20     | ⏳     | ⏳      | ⏳     |
-| Calls          | 13     | ⏳     | ⏳      | ⏳     |
-| **Total**      | **42** | **0**  | **0**   | **0**  |
+| API            | Total | Tested | Status |
+| -------------- | ----- | ------ | ------ |
+| RL Environment | 8     | 8      | ✅ Functional |
+| Calendar       | 20    | 0      | ⚠️ Manual testing only |
+| Calls          | 13    | 0      | ⚠️ Manual testing only |
+| **Total**      | **41** | **8**  | **🔄 In Progress** |
+
+## Related Documentation
+
+- **[API_QUICK_REFERENCE.md](./API_QUICK_REFERENCE.md)** - Request/response examples
+- **[docs/API.md](./docs/API.md)** - Complete technical specifications
+- **[RL_OVERVIEW.md](./RL_OVERVIEW.md)** - RL environment architecture
+- **[docs/CALENDAR_API.md](./docs/CALENDAR_API.md)** - Calendar system guide
+- **[docs/CALLS_API.md](./docs/CALLS_API.md)** - Video calls system guide
