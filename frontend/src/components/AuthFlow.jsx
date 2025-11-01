@@ -505,6 +505,27 @@ function RegisterOTPInput({ email, onOtpVerified, onBack }) {
     if (value && index < 5) {
       inputRefs[index + 1].current?.focus();
     }
+
+    // Auto-submit when all 6 digits are entered
+    if (index === 5 && value) {
+      // All boxes are now filled
+      const completeOtp = [...newOtp];
+      completeOtp[index] = value;
+      const otpCode = completeOtp.join("");
+
+      // Trigger submission automatically
+      setTimeout(() => {
+        if (otpCode === "123456") {
+          setLoading(true);
+          setTimeout(() => {
+            setLoading(false);
+            onOtpVerified();
+          }, 500);
+        } else {
+          setError("Invalid OTP. Use 123456 to continue.");
+        }
+      }, 100);
+    }
   };
 
   const handleKeyDown = (index, e) => {
@@ -529,6 +550,10 @@ function RegisterOTPInput({ email, onOtpVerified, onBack }) {
     await new Promise((resolve) => setTimeout(resolve, 500));
     if (otpCode === "123456") {
       // Dummy OTP
+      setLoading(false);
+      alert(
+        "✅ Email verified successfully! Please complete your registration."
+      );
       onOtpVerified();
     } else {
       setError("Invalid OTP. Use 123456 to continue.");
