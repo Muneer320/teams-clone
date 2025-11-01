@@ -1,0 +1,23 @@
+{
+    "title": "Team Standup",
+    "description": "Daily sync meeting",
+    "startTime": "2025-11-05T09:00:00Z",
+    "endTime": "2025-11-05T09:30:00Z",
+    "organizerId": "user-1",
+    "organizerName": "Alice Johnson",
+    "attendees": [
+        {
+            "id": "user-2",
+            "name": "Bob Smith",
+            "email": "bob@example.com"
+        }
+    ],
+    "channelId": "channel-1",
+    "isOnline": true,
+    "reminders": [
+        {
+            "minutesBefore": 15,
+            "type": "notification"
+        }
+    ]
+}
