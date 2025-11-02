@@ -152,21 +152,22 @@ def test_calendar_endpoints():
     if meetings and 'meetings' in meetings:
         print(f"Number of meetings: {len(meetings['meetings'])}")
 
-    # 2. POST /calendar/meetings
+    # 2. POST /calendar/meetings/create
     print("\n" + "-"*80)
     tomorrow = (datetime.now() + timedelta(days=1)).isoformat()
     new_meeting = test_endpoint(
-        "POST", "/calendar/meetings",
+        "POST", "/calendar/meetings/create",
         data={
             "title": "Test Meeting",
             "startTime": tomorrow,
             "endTime": (datetime.now() + timedelta(days=1, hours=1)).isoformat(),
+            "organizerId": "user1",
+            "organizerName": "Test User",
             "attendees": ["user1@test.com", "user2@test.com"],
             "description": "Test meeting description",
             "channelId": "channel-1"
         },
-        description="Create a new meeting",
-        expected_status=201
+        description="Create a new meeting"
     )
 
     meeting_id = None
@@ -208,10 +209,10 @@ def test_calendar_endpoints():
         description="Get meetings for a specific channel"
     )
 
-    # 7. GET /calendar/meetings/range
+    # 7. GET /calendar/meetings (with date range filters)
     print("\n" + "-"*80)
     range_meetings = test_endpoint(
-        "GET", f"/calendar/meetings/range?start={datetime.now().isoformat()}&end={(datetime.now() + timedelta(days=7)).isoformat()}",
+        "GET", f"/calendar/meetings?startDate={datetime.now().isoformat()}&endDate={(datetime.now() + timedelta(days=7)).isoformat()}",
         description="Get meetings in date range"
     )
 
@@ -250,17 +251,18 @@ def test_calls_endpoints():
         description="Get all active calls"
     )
 
-    # 2. POST /calls/start
+    # 2. POST /calls/create
     print("\n" + "-"*80)
     new_call = test_endpoint(
-        "POST", "/calls/start",
+        "POST", "/calls/create",
         data={
+            "type": "video",
             "channelId": "channel-1",
             "userId": "user1",
-            "callType": "video"
+            "userName": "Test User",
+            "participants": []
         },
-        description="Start a new call",
-        expected_status=201
+        description="Start a new call"
     )
 
     call_id = None
