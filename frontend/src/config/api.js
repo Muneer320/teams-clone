@@ -7,12 +7,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
 
 export const API_CONFIG = {
+  BASE: API_BASE_URL,
   BASE_URL: API_BASE_URL,
   SOCKET_URL: SOCKET_URL,
   AUTH: `${API_BASE_URL}/auth`,
   CALENDAR: `${API_BASE_URL}/calendar`,
   CALLS: `${API_BASE_URL}/calls`,
   ENV: `${API_BASE_URL}/env`,
+  USER: "http://localhost:3001/user",
+  CHAT: "http://localhost:3001/api/messages", // 👈 since messages live under /api/messages
 };
 
 export default API_CONFIG;

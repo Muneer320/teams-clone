@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 
 // Use the same database file as initDB.js
-const dbPath = path.resolve("./database.sqlite");
+const dbPath = path.resolve("./data/teams_clone.db");
 
 // Ensure database directory exists
 const dbDir = path.dirname(dbPath);
@@ -18,6 +18,11 @@ const dbPromise = open({
   filename: dbPath,
   driver: sqlite3.Database,
 });
+
+// Function wrapper to open database — this matches how you call it elsewhere
+export async function openDB() {
+  return await dbPromise;
+}
 
 // Initialize database tables if they don't exist
 async function initializeTables() {
@@ -89,5 +94,5 @@ async function initializeTables() {
 
 initializeTables();
 
-// Export the database connection for use in other files
-export default dbPromise;
+// Default export for flexibility (still exports the same dbPromise)
+export default openDB;
