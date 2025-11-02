@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import MICROSOFT_LOGO from "../assets/logo.png";
 import BACKGROUND_IMAGE from "../assets/fluent_web_dark_2.svg";
 
@@ -54,6 +55,7 @@ export default function AuthFlow({ onAuthSuccess }) {
   const handleRegistrationSuccess = (token) => {
     localStorage.setItem("token", token);
     onAuthSuccess(token);
+    
   };
 
   // Render the current step
