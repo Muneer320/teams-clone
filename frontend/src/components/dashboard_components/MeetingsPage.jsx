@@ -10,6 +10,7 @@ import {
   MoreHorizontal,
   EyeOff,
 } from "lucide-react";
+import API_CONFIG from "../../config/api";
 
 const MeetingsPage = () => {
   const navigate = useNavigate();
@@ -45,19 +46,75 @@ const MeetingsPage = () => {
     };
   }, [showCreatePopup]);
 
-  const handleCreateMeeting = () => {
+  const handleCreateMeeting = async () => {
     if (meetingTitle.trim()) {
-      const newMeeting = {
-        id: Date.now(),
-        title: meetingTitle,
-        createdAt: new Date(),
-        link: `https://teams.microsoft.com/meet/${Math.random()
+      try {
+        // Get user info from localStorage
+        const userName = localStorage.getItem("userName") || "Guest User";
+        let userId = localStorage.getItem("userId");
+
+        // Generate and save userId if it doesn't exist
+        if (!userId) {
+          userId = `user-${Date.now()}`;
+          localStorage.setItem("userId", userId);
+        }
+
+        // Generate unique channel ID for this meeting
+        const uniqueChannelId = `meeting-${Date.now()}-${Math.random()
           .toString(36)
-          .substr(2, 9)}`,
-      };
-      setMeetingLinks([newMeeting, ...meetingLinks]);
-      setMeetingTitle("");
-      setShowCreatePopup(false);
+          .substr(2, 9)}`;
+
+        // Create call via backend API
+        const response = await fetch(`${API_CONFIG.CALLS}/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "video",
+            channelId: uniqueChannelId, // Unique channel for each meeting
+            userId: userId,
+            userName: userName,
+            participants: [],
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Backend returns call.id, not call.callId
+          const callId = data.call.id;
+          const newMeeting = {
+            id: callId,
+            title: meetingTitle,
+            createdAt: new Date(),
+            link: `${window.location.origin}/dashboard/active-call/${callId}`,
+            callId: callId,
+          };
+
+          setMeetingLinks([newMeeting, ...meetingLinks]);
+
+          // Copy link to clipboard
+          navigator.clipboard.writeText(newMeeting.link);
+
+          setMeetingTitle("");
+          setShowCreatePopup(false);
+
+          // Ask user if they want to join immediately
+          const joinNow = window.confirm(
+            `Meeting created successfully!\n\nLink copied to clipboard: ${newMeeting.link}\n\nDo you want to join the meeting now?`
+          );
+
+          if (joinNow) {
+            navigate(`/dashboard/active-call/${callId}`);
+          }
+        } else {
+          alert("Failed to create meeting: " + data.error);
+        }
+      } catch (error) {
+        console.error("Error creating meeting:", error);
+        alert("Failed to create meeting. Please try again.");
+      }
     }
   };
 
@@ -223,9 +280,7 @@ const MeetingsPage = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        navigate("/join-meeting", {
-                          state: { meetingTitle: meeting.title },
-                        });
+                        navigate(`/dashboard/active-call/${meeting.callId}`);
                       }}
                       className="flex-1 bg-[#2a2a2a] hover:bg-[#333333] text-white py-2 rounded text-sm font-medium transition"
                     >
@@ -364,9 +419,7 @@ const MeetingsPage = () => {
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
-                          navigate("/join-meeting", {
-                            state: { meetingTitle: meeting.title },
-                          });
+                          navigate(`/dashboard/active-call/${meeting.callId}`);
                         }}
                         className="flex-1 bg-[#2a2a2a] hover:bg-[#333333] text-white py-2 rounded text-sm font-medium transition"
                       >

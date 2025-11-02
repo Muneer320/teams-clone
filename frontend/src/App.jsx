@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 
 import HomePage from "./components/HomePage";
@@ -30,9 +31,22 @@ function Logout({ onLogout }) {
   );
 }
 
+// Component to handle protected route redirects
+function ProtectedRoute({ children, isAuthenticated }) {
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    // Save the current location to redirect after login
+    localStorage.setItem("redirectAfterLogin", location.pathname);
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+}
+
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState(null);
+  const [, setToken] = useState(null);
   const navigate = useNavigate();
 
   // ✅ Check for saved token when app loads
@@ -50,7 +64,15 @@ function AppContent() {
     setIsAuthenticated(true);
     localStorage.setItem("token", newToken);
     console.log("Authentication successful! Token:", newToken);
-    navigate("/dashboard");
+
+    // Check if there's a saved redirect URL
+    const redirectUrl = localStorage.getItem("redirectAfterLogin");
+    if (redirectUrl) {
+      localStorage.removeItem("redirectAfterLogin");
+      navigate(redirectUrl);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   // ✅ Handle logout
@@ -102,12 +124,9 @@ function AppContent() {
         <Route
           path="/dashboard/*"
           element={
-            isAuthenticated ? (
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Dashboard onLogout={handleLogout} />
-            ) : (
-              // <Temp onLogout={handleLogout} />
-              <Navigate to="/login" replace />
-            )
+            </ProtectedRoute>
           }
         />
 
@@ -115,7 +134,9 @@ function AppContent() {
         <Route
           path="/join-meeting"
           element={
-            isAuthenticated ? <JoinMeeting /> : <Navigate to="/login" replace />
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <JoinMeeting />
+            </ProtectedRoute>
           }
         />
 

@@ -40,6 +40,7 @@ const Dashboard = () => {
             {/* Full width routes without padding */}
             <Route path="communities" element={<Communities />} />
             <Route path="chat" element={<ChatsTab />} />
+            <Route path="active-call/:callId" element={<ActiveCall />} />
             <Route path="active-call" element={<ActiveCall />} />
 
             {/* Other routes with padding */}
