@@ -216,11 +216,11 @@ def test_calendar_endpoints():
         description="Get meetings in date range"
     )
 
-    # 8. POST /calendar/meetings/:id/rsvp
+    # 8. POST /calendar/meetings/:id/respond
     if meeting_id:
         print("\n" + "-"*80)
         rsvp = test_endpoint(
-            "POST", f"/calendar/meetings/{meeting_id}/rsvp",
+            "POST", f"/calendar/meetings/{meeting_id}/respond",
             data={
                 "userId": "user1",
                 "response": "accepted"
@@ -285,7 +285,7 @@ def test_calls_endpoints():
             "POST", f"/calls/{call_id}/join",
             data={
                 "userId": "user2",
-                "mediaOptions": {"audio": True, "video": True}
+                "userName": "Test User 2"
             },
             description="Join a call"
         )
