@@ -6,13 +6,13 @@ Template for implementing reinforcement learning agents (DQN, PPO, A3C, etc.)
 This is a starting point - team members can implement their own RL algorithms here.
 """
 
+from client import TeamsEnvClient, ObservationWrapper
 import numpy as np
 import sys
 import os
 
 # Add parent directory to path to import client
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from client import TeamsEnvClient, ObservationWrapper
 
 
 class RLAgent:

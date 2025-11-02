@@ -5,6 +5,7 @@ This agent takes random actions in the environment.
 Useful for baseline testing and environment validation.
 """
 
+from client import TeamsEnvClient, ObservationWrapper
 import random
 import time
 import sys
@@ -12,7 +13,6 @@ import os
 
 # Add parent directory to path to import client
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from client import TeamsEnvClient, ObservationWrapper
 
 
 def random_agent(episodes: int = 5, max_steps: int = 50):
