@@ -11,6 +11,7 @@ import HomePage from "./components/HomePage";
 import AuthFlow from "./components/AuthFlow";
 import Dashboard from "./components/Dashboard";
 import NotFound from "./components/NotFound";
+import JoinMeeting from "./components/JoinMeeting";
 // import Temp from "./components/Temp";
 
 // ✅ This small component handles logout automatically
@@ -103,10 +104,18 @@ function AppContent() {
           element={
             isAuthenticated ? (
               <Dashboard onLogout={handleLogout} />
-              // <Temp onLogout={handleLogout} />
             ) : (
+              // <Temp onLogout={handleLogout} />
               <Navigate to="/login" replace />
             )
+          }
+        />
+
+        {/* Join Meeting - Full page route */}
+        <Route
+          path="/join-meeting"
+          element={
+            isAuthenticated ? <JoinMeeting /> : <Navigate to="/login" replace />
           }
         />
 
