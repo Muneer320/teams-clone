@@ -163,7 +163,10 @@ def test_calendar_endpoints():
             "endTime": (datetime.now() + timedelta(days=1, hours=1)).isoformat(),
             "organizerId": "user1",
             "organizerName": "Test User",
-            "attendees": ["user1@test.com", "user2@test.com"],
+            "attendees": [
+                {"id": "user1", "name": "Test User", "email": "user1@test.com"},
+                {"id": "user2", "name": "Test User 2", "email": "user2@test.com"}
+            ],
             "description": "Test meeting description",
             "channelId": "channel-1"
         },
