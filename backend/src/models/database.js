@@ -23,7 +23,7 @@ const dbPromise = open({
 async function initializeTables() {
   try {
     const db = await dbPromise;
-    
+
     await db.exec(`
       CREATE TABLE IF NOT EXISTS user (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -80,7 +80,7 @@ async function initializeTables() {
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
       );
     `);
-    
+
     console.log("✅ Connected to SQLite database and tables initialized.");
   } catch (err) {
     console.error("❌ Error initializing database:", err);
