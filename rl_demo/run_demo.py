@@ -3,15 +3,14 @@ Quick Demo Script for TeamsClone-RL Environment
 Runs a single episode with a rule-based agent and displays actions/rewards.
 """
 
+from task_agent import TaskAgent
+from client import TeamsEnvClient
 import sys
 import os
 import time
 
 # Add python_agent to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'python_agent'))
-
-from client import TeamsEnvClient
-from task_agent import TaskAgent
 
 
 def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
@@ -24,14 +23,19 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
     # Initialize client and agent
     print(f"\n📡 Connecting to environment: {base_url}")
     client = TeamsEnvClient(base_url)
-    agent = TaskAgent()
+    agent = TaskAgent(client)
 
     # Start episode
     print(f"\n🎯 Starting episode with task: {task_type}")
     episode_info = client.reset(task_type=task_type)
-    print(f"   Episode ID: {episode_info.get('episode_id', 'N/A')}")
-    print(
-        f"   Task Description: {episode_info.get('task_description', 'N/A')}")
+
+    # Extract task info
+    task_info = episode_info.get('task', {})
+    print(f"   Episode ID: {episode_info.get('episodeId', 'N/A')}")
+    print(f"   Task Name: {task_info.get('name', 'N/A')}")
+    print(f"   Task Description: {task_info.get('description', 'N/A')}")
+    print(f"   Max Steps: {task_info.get('maxSteps', 'N/A')}")
+    print(f"   Completion Reward: +{task_info.get('reward', 0)}")
 
     # Run episode
     done = False
@@ -47,6 +51,15 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
         # Get current state
         state_response = client.get_state()
         state = state_response.get("state", {})
+        
+        # Show state summary on first step
+        if step_count == 0:
+            current_channel = state.get('currentChannel', {})
+            recent_msgs = state.get('recentMessages', [])
+            print(f"📍 Initial State:")
+            print(f"   Channel: {current_channel.get('name', 'Unknown')}")
+            print(f"   Recent Messages: {len(recent_msgs)}")
+            print()
 
         # Agent selects action
         action = agent.select_action(state)
@@ -64,10 +77,26 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
         # Display step info
         print(f"Step {step_count}:")
         print(f"  🎮 Action: {action.get('type', 'unknown')}")
-        if action.get('content'):
-            print(f"     Content: \"{action.get('content')[:50]}...\"")
+        
+        # Show action payload details
+        payload = action.get('payload', {})
+        if action.get('type') == 'send_message' and payload.get('content'):
+            content = payload['content']
+            print(f"     💬 Message: \"{content[:60]}{'...' if len(content) > 60 else ''}\"")
+        elif action.get('type') == 'react_to_message' and payload.get('reaction'):
+            print(f"     👍 Reaction: {payload['reaction']}")
+        elif action.get('type') == 'switch_channel' and payload.get('channelId'):
+            print(f"     📺 Channel: {payload['channelId']}")
+        
         print(f"  🏆 Reward: {reward:+.2f}")
         print(f"  📊 Total Reward: {total_reward:+.2f}")
+        
+        # Show completion status
+        if done:
+            if info.get('taskCompleted'):
+                print(f"  🎉 Task Completed! Bonus: +{info.get('taskReward', 0):.1f}")
+            else:
+                print(f"  ⏱️  Episode ended")
 
         if info.get("message"):
             print(f"  💬 Info: {info['message']}")
