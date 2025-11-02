@@ -103,17 +103,6 @@ App runs on: `http://localhost:5173`
 - ✅ Calendar/meeting interface
 - ✅ User selector for testing
 
-**Your tasks:**
-
-- [ ] Add dark mode toggle
-- [ ] Improve video call UI (grid layout for multiple participants)
-- [ ] Add file upload and attachment preview
-- [ ] Implement message reactions UI
-- [ ] Add typing indicators
-- [ ] Create notification system
-- [ ] Add user profiles and settings page
-- [ ] Improve mobile responsiveness
-
 **Key files:**
 
 - `src/App.jsx` - Main app with tab navigation

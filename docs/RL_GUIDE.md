@@ -486,9 +486,9 @@ actionSendMessage(episode, payload) {
 - **Backend Code**: `backend/src/models/environment.js`
 - **API Routes**: `backend/src/routes/env.js`
 - **Python Client**: `python_agent/client.py`
-- **Agent**: `python_agent/agent.py`
-- **Test Script**: `python_agent/test.py`
-- **Demo**: `python_agent/demo.py`
+- **Agent**: `python_agent/task_agent.py`
+- **Test Scripts**: `tests/test_rl_complete.py`, `tests/test_rl_endpoints.py`
+- **Demo Scripts**: `rl_demo/run_demo.py`, `rl_demo/plot_results.py`
 
 ## 🐛 Troubleshooting
 
