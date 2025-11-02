@@ -11,9 +11,13 @@ from client import TeamsEnvClient
 class TaskAgent:
     """
     Agent that can handle different task types with task-specific policies.
+
+    Can be used in two ways:
+    1. With client: agent = TaskAgent(client); agent.run_episode()
+    2. Without client: agent = TaskAgent(); action = agent.select_action(state)
     """
 
-    def __init__(self, client):
+    def __init__(self, client=None):
         self.client = client
         self.episode_id = None
         self.task_type = None

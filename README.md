@@ -292,6 +292,10 @@ teams-clone/
 │   ├── CALLS_API.md        # Calls endpoints
 │   └── CALENDAR_*.md       # Calendar implementation docs
 │
+├── tests/                  # Test suite
+│   ├── test_rl_complete.py     # Comprehensive RL tests
+│   ├── test_all_endpoints.py   # All 41 API endpoint tests
+│   └── README.md               # Test documentation
 ├── RL_OVERVIEW.md          # System architecture
 ├── AGENT_DESIGN.md         # Agent design patterns
 ├── API_ENDPOINTS.md        # All 41 endpoints list
@@ -299,6 +303,25 @@ teams-clone/
 ├── QUICKSTART.md           # 5-minute setup guide
 └── README.md               # This file
 ```
+
+## 🧪 Testing
+
+Comprehensive test suite available in the `tests/` folder.
+
+**Quick test:**
+
+```bash
+python tests/test_rl_complete.py
+```
+
+**Test coverage:**
+
+- ✅ 8/8 RL API endpoints
+- ✅ 7/7 Python client functions
+- ✅ 2/2 TaskAgent methods
+- ⚠️ Calendar & Calls APIs (manual testing)
+
+See [`tests/README.md`](./tests/README.md) for detailed testing documentation.
 
 ## 🤝 Contributing
 
