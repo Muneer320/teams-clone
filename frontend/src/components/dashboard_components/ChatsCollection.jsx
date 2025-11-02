@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown, UserPlus2 } from "lucide-react";
-import API_CONFIG from "../../config/api"; // ✅ use your API config
+import API_CONFIG from "../../config/api";
 
-export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
+export const ChatsCollection = ({
+  onSelectChat,
+  activeChatId,
+  onNewChatClick, // ✅ receives from ChatsTab
+}) => {
   const [chats, setChats] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Recent");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -15,32 +19,33 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
       try {
         const userEmail = localStorage.getItem("email");
         const token = localStorage.getItem("token");
+
         if (!userEmail || !token) {
           console.error("❌ Missing user email or token in localStorage");
           return;
         }
 
-        console.log(`${API_CONFIG.USER}/contacts/${userEmail}`)
-        console.log(token)
-
         const res = await fetch(`${API_CONFIG.USER}/contacts/${userEmail}`, {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
 
         const data = await res.json();
         if (data.success) {
-            console.log(data);
-          // 🔄 Adapt contacts to chat format
           const formatted = data.contacts.map((c) => ({
             id: c.id,
             name: c.name || c.nickname,
             email: c.email,
             lastMessage: c.last_message || "Start a chat...",
-            time: c.added_on ? new Date(c.added_on).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "",
+            time: c.added_on
+              ? new Date(c.added_on).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "",
           }));
           setChats(formatted);
         } else {
@@ -57,24 +62,51 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
   }, []);
 
   return (
-    <div className="w-[28rem] h-full bg-[#0A0A0A] flex flex-col text-gray-200">
+    <div className="relative w-[28rem] h-full bg-[#0A0A0A] flex flex-col text-gray-200">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[#1f1f1f]">
         <h2 className="text-lg font-semibold">Chat</h2>
+
         <div className="flex items-center space-x-3">
-          {[
-            `<path d='M7.5 13h5a.5.5 0 0 1 .09 1H7.5a.5.5 0 0 1-.09-1h5.09-5Z'/>`,
-            `<path d='M5 4a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-.32l3.04 2.1c.83.57 1.96-.03 1.96-1.03v-7.5c0-1-1.13-1.6-1.96-1.03L13 7.32V7a3 3 0 0 0-3-3H5Z'/>`,
-            `<path d='M17.85 2.85a.5.5 0 0 0-.7-.7l-8 8L9 11l.85-.15 8-8Z'/>`,
-          ].map((path, i) => (
-            <div
-              key={i}
-              className="p-2 rounded-lg bg-[#1A1A1A] border border-[#2a2a2a] hover:bg-[#252525] hover:border-[#383838] transition-colors cursor-pointer"
-              dangerouslySetInnerHTML={{
-                __html: `<svg fill="currentColor" width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">${path}</svg>`,
-              }}
-            ></div>
-          ))}
+          {/* Search Icon */}
+          <div className="p-2 rounded-lg bg-[#1A1A1A] border border-[#2a2a2a] hover:bg-[#252525] hover:border-[#383838] cursor-pointer transition-colors">
+            <svg
+              fill="currentColor"
+              width="1.2em"
+              height="1.2em"
+              viewBox="0 0 20 20"
+            >
+              <path d="M7.5 13h5a.5.5 0 0 1 .09 1H7.5a.5.5 0 0 1-.09-1h5.09-5Zm-2-4h9a.5.5 0 0 1 .09 1H5.5a.5.5 0 0 1-.09-1h9.09-9Zm-2-4h13a.5.5 0 0 1 .09 1H3.5a.5.5 0 0 1-.09-1H16.5h-13Z" />
+            </svg>
+          </div>
+
+          {/* Chat Bubble Icon */}
+          <div className="p-2 rounded-lg bg-[#1A1A1A] border border-[#2a2a2a] hover:bg-[#252525] hover:border-[#383838] cursor-pointer transition-colors">
+            <svg
+              fill="currentColor"
+              width="1.1em"
+              height="1.1em"
+              viewBox="0 0 20 20"
+            >
+              <path d="M5 4a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h5a3 3 0 0 0 3-3v-.32l3.04 2.1c.83.57 1.96-.03 1.96-1.03v-7.5c0-1-1.13-1.6-1.96-1.03L13 7.32V7a3 3 0 0 0-3-3H5Zm8 4.54 3.6-2.5c.17-.1.4.01.4.21v7.5c0 .2-.23.32-.4.2L13 11.46V8.54ZM3 7c0-1.1.9-2 2-2h5a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+            </svg>
+          </div>
+
+          {/* 🆕 New Chat Icon */}
+          <div
+            onClick={onNewChatClick} // ✅ triggers parent handler
+            className="p-2 rounded-lg bg-[#1A1A1A] border border-[#2a2a2a] hover:bg-[#252525] hover:border-[#383838] cursor-pointer transition-colors"
+            title="Start new chat"
+          >
+            <svg
+              fill="currentColor"
+              width="1.1em"
+              height="1.1em"
+              viewBox="0 0 20 20"
+            >
+              <path d="M17.85 2.85a.5.5 0 0 0-.7-.7l-8 8L9 11l.85-.15 8-8ZM5.5 3A2.5 2.5 0 0 0 3 5.5v9A2.5 2.5 0 0 0 5.5 17h9a2.5 2.5 0 0 0 2.5-2.5v-6a.5.5 0 0 0-1 0v6c0 .83-.67 1.5-1.5 1.5h-9A1.5 1.5 0 0 1 4 14.5v-9C4 4.67 4.67 4 5.5 4h6a.5.5 0 0 0 0-1h-6Z" />
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -86,14 +118,14 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
         >
           <ChevronDown
             className={`w-3 h-3 text-gray-400 group-hover:text-gray-200 transition-all ${
-              isDropdownOpen ? "rotate-180" : "rotate-0"
+              isDropdownOpen ? "rotate-180" : ""
             }`}
           />
           <span className="group-hover:text-gray-200">{selectedCategory}</span>
         </button>
 
         {isDropdownOpen && (
-          <div className="absolute top-8 left-5 w-40 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-lg z-10 overflow-hidden animate-fadeIn">
+          <div className="absolute top-8 left-5 w-40 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-lg z-10 overflow-hidden">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -114,12 +146,16 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
         )}
       </div>
 
-      {/* Chats */}
+      {/* Chats List */}
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2 scrollbar-none">
         {loading ? (
-          <div className="text-gray-500 text-center mt-10 text-sm">Loading chats...</div>
+          <div className="text-gray-500 text-center mt-10 text-sm">
+            Loading chats...
+          </div>
         ) : chats.length === 0 ? (
-          <div className="text-gray-500 text-center mt-10 text-sm">No chats found</div>
+          <div className="text-gray-500 text-center mt-10 text-sm">
+            No chats found
+          </div>
         ) : (
           chats.map((chat) => {
             const isActive = activeChatId === chat.id;
@@ -132,7 +168,7 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
                 }`}
               >
                 <div
-                  className="relative w-10 h-10 rounded-full flex items-center justify-center text-black font-semibold mr-3"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-black font-semibold mr-3"
                   style={{ backgroundColor: "#FBDED8" }}
                 >
                   {chat.name.charAt(0).toUpperCase()}
@@ -141,14 +177,18 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
                   <div className="flex justify-between items-center">
                     <h4
                       className={`truncate font-medium ${
-                        isActive ? "text-gray-100 font-semibold" : "text-gray-200"
+                        isActive
+                          ? "text-gray-100 font-semibold"
+                          : "text-gray-200"
                       }`}
                     >
                       {chat.name}
                     </h4>
                     <span
                       className={`text-xs ml-2 ${
-                        isActive ? "text-gray-100 font-semibold" : "text-gray-400"
+                        isActive
+                          ? "text-gray-100 font-semibold"
+                          : "text-gray-400"
                       }`}
                     >
                       {chat.time}
@@ -168,7 +208,8 @@ export const ChatsCollection = ({ onSelectChat, activeChatId }) => {
         )}
       </div>
 
-      <div className="p-3 text-center bg-[#0A0A0A]">
+      {/* Invite Button */}
+      <div className="p-3 text-center bg-[#0A0A0A] border-t border-[#1f1f1f]">
         <button className="flex items-center justify-center border w-full bg-[#292929] hover:bg-[#252525] text-gray-300 rounded-xl px-3 py-2 transition-colors text-sm font-medium">
           <UserPlus2 className="w-4 h-4 mr-2" />
           Invite to Teams

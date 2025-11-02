@@ -7,12 +7,22 @@ import {
   HelpCircle,
   MessageSquare,
   CheckCircle,
+  Loader2,
+  UserPlus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import API_CONFIG from "../../config/api";
+
+const API_URL = API_CONFIG.USER;
 
 export const TopBar = ({ onMenuClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef(null);
   const menuRef = useRef(null);
   const profileRef = useRef(null);
   const navigate = useNavigate();
@@ -21,10 +31,12 @@ export const TopBar = ({ onMenuClick }) => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
-        (menuRef.current && menuRef.current.contains(e.target)) ||
-        (profileRef.current && profileRef.current.contains(e.target))
+        searchRef.current?.contains(e.target) ||
+        menuRef.current?.contains(e.target) ||
+        profileRef.current?.contains(e.target)
       )
         return;
+      setShowResults(false);
       setIsMenuOpen(false);
       setIsProfileOpen(false);
     };
@@ -32,12 +44,67 @@ export const TopBar = ({ onMenuClick }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    navigate("/logout");
+  // 🔍 Real-time search
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const token = localStorage.getItem("token");
+        setLoading(true);
+        const res = await fetch(
+          `${API_URL}/search?query=${encodeURIComponent(searchTerm)}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        if (data.success) setSearchResults(data.users);
+      } catch (err) {
+        console.error("Search error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
+
+  const handleAddFriend = async (friendEmail) => {
+    try {
+      const token = localStorage.getItem("token");
+      const userEmail = localStorage.getItem("email"); // or from context
+      const res = await fetch(`${API_URL}/add-friend`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_email: userEmail,
+          friend_email: friendEmail,
+        }),
+      });
+
+      const data = await res.json();
+      console.log(data.message || data.error);
+    } catch (err) {
+      console.error("Error adding friend:", err);
+    }
   };
 
+  const handleLogout = () => navigate("/logout");
+
   return (
-    <header className="h-14 bg-[#0A0A0A]  grid grid-cols-3 items-center px-4 relative">
+    <header className="h-14 bg-[#0A0A0A] grid grid-cols-3 items-center px-4 relative">
       {/* Left section */}
       <div className="flex items-center justify-start gap-3">
         <button
@@ -49,14 +116,59 @@ export const TopBar = ({ onMenuClick }) => {
       </div>
 
       {/* Center search */}
-      <div className="flex justify-center">
+      <div className="flex justify-center" ref={searchRef}>
         <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b3b3b3]" />
           <input
             type="text"
             placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setShowResults(true);
+            }}
             className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-10 py-2 text-sm text-white placeholder:text-[#8f8f8f] focus:outline-none focus:ring-1 focus:ring-[#8B8BFF]"
           />
+
+          {/* Search dropdown */}
+          {showResults && (
+            <div className="absolute mt-2 w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-lg z-50 overflow-y-auto max-h-80 animate-fadeIn">
+              {loading ? (
+                <div className="flex items-center justify-center py-4 text-gray-400 text-sm">
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Searching...
+                </div>
+              ) : searchResults.length > 0 ? (
+                searchResults.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#292929] flex items-center justify-center text-xs font-medium text-white">
+                        {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+                      </div>
+                      <div>
+                        <p className="text-sm text-white font-medium">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-gray-400">{user.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleAddFriend(user.email)}
+                      className="p-1.5 hover:bg-[#3a3a3a] rounded-md transition"
+                    >
+                      <UserPlus className="w-4 h-4 text-[#8B8BFF]" />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="py-3 text-center text-gray-500 text-sm">
+                  No users found
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -78,57 +190,22 @@ export const TopBar = ({ onMenuClick }) => {
 
           {isMenuOpen && (
             <div className="absolute right-0 top-10 w-56 bg-[#1f1f1f] border border-[#2a2a2a] rounded-lg shadow-lg z-50 animate-fadeIn">
-              {/* Premium section */}
-              <div className="flex items-center gap-2 px-4 py-3 hover:bg-[#2a2a2a] cursor-pointer rounded-t-lg">
-                <span
-                  className="text-[#a68eff]"
-                  dangerouslySetInnerHTML={{
-                    __html: `<svg fill="currentColor" width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 2.75a.75.75 0 0 0-.66.39l-2.75 5c-.15.27-.11.6.08.84l7.25 8.75a.75.75 0 0 0 1.16 0l7.25-8.75c.2-.24.23-.57.08-.84l-2.75-5a.75.75 0 0 0-.66-.39h-9ZM4.16 7.5l1.78-3.25h1.5L6.31 7.5H4.16ZM6.14 9l1.93 4.75L4.14 9h2ZM10 14.48 7.76 9h4.39l-2.16 5.48ZM7.89 7.5l1.14-3.25h1.95l1.2 3.25H7.88Zm5.88 0-1.2-3.25h1.49l1.78 3.25h-2.07Zm0 1.5h2.1l-4.01 4.83L13.76 9Z"></path></svg>`,
-                  }}
-                />
-                <span className="text-sm text-gray-200">Upgrade</span>
-              </div>
-
-              <div className="border-t border-[#2a2a2a]" />
-
-              {/* Menu options */}
               <ul className="py-2 text-sm text-gray-300">
                 <li className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer">
-                  <Settings size={16} />
-                  Settings
+                  <Settings size={16} /> Settings
                 </li>
                 <li className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer">
-                  <HelpCircle size={16} />
-                  Help
+                  <HelpCircle size={16} /> Help
                 </li>
                 <li className="flex items-center gap-2 px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer">
-                  <MessageSquare size={16} />
-                  Feedback
-                </li>
-              </ul>
-
-              <div className="border-t border-[#2a2a2a]" />
-
-              {/* Footer options */}
-              <ul className="py-2 text-sm text-gray-300">
-                <li className="px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer">
-                  Keyboard shortcuts
-                </li>
-                <li className="px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer">
-                  Get the desktop app
-                </li>
-                <li className="px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer">
-                  Get the mobile app
-                </li>
-                <li className="px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer rounded-b-lg">
-                  Teams Insider program
+                  <MessageSquare size={16} /> Feedback
                 </li>
               </ul>
             </div>
           )}
         </div>
 
-        {/* Profile bubble & dropdown */}
+        {/* Profile dropdown */}
         <div className="relative" ref={profileRef}>
           <div
             onClick={() => {
@@ -159,9 +236,6 @@ export const TopBar = ({ onMenuClick }) => {
                 <div>
                   <p className="text-white font-medium">Kartik Dixit</p>
                   <p className="text-[#9f9f9f] text-xs">kartik@example.com</p>
-                  <p className="text-[#8B8BFF] text-xs mt-0.5 cursor-pointer">
-                    My Microsoft account ↗
-                  </p>
                 </div>
               </div>
 
