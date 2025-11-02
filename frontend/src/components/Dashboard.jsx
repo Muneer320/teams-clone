@@ -31,13 +31,14 @@ const Dashboard = () => {
         )}
 
         {/* Main Content with Nested Routing */}
-        <main className="flex-1 overflow-y-auto bg-[#1a1a1a]">
+        <main className="flex-1 overflow-hidden bg-[#1a1a1a]">
           <Routes>
             {/* Default route redirects to /dashboard/chat */}
             <Route path="/" element={<Navigate to="chat" replace />} />
 
-            {/* Communities route - full width without padding */}
+            {/* Full width routes without padding */}
             <Route path="communities" element={<Communities />} />
+            <Route path="chat" element={<ChatsTab />} />
 
             {/* Other routes with padding */}
             <Route
@@ -47,7 +48,6 @@ const Dashboard = () => {
                   <Routes>
                     <Route path="meet" element={<MeetingsPage />} />
                     <Route path="calendar" element={<CalenderPage />} />
-                    <Route path="chat" element={<ChatsTab />} />
                     <Route path="settings" element={<SettingsPage />} />
                   </Routes>
                 </div>

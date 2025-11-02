@@ -6,7 +6,7 @@ const ChatsTab = ({ userId }) => {
   const [selectedChat, setSelectedChat] = useState(null);
 
   return (
-    <div className="flex h-screen bg-[#0A0A0A]">
+    <div className="flex h-full bg-[#0A0A0A]">
       <ChatsCollection
         userId={userId}
         activeChatId={selectedChat?.id}
