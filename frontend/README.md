@@ -32,11 +32,17 @@ App runs on `http://localhost:5173`
 
 ## Environment Variables
 
-Create `.env` file:
+The frontend uses environment-specific configurations for API endpoints:
+
+- **Development**: Uses `.env` (localhost)
+- **Production**: Uses `.env.production` (Render hosted URL)
+
+See [ENVIRONMENT_CONFIG.md](./ENVIRONMENT_CONFIG.md) for detailed setup instructions.
+
+Quick setup:
 
 ```bash
-VITE_API_URL=http://localhost:3001
-VITE_SOCKET_URL=http://localhost:3001
+cp .env.example .env  # Copy template (already configured for local dev)
 ```
 
 ## Project Structure

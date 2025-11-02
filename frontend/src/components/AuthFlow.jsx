@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import MICROSOFT_LOGO from "../assets/logo.png";
 import BACKGROUND_IMAGE from "../assets/fluent_web_dark_2.svg";
+import API_CONFIG from "../config/api";
 
 // Use the new asset paths you provided
 // import microsoftLogo from "../assets/logo.png"; // Removed import
 // import bg from "../assets/fluent_web_dark_2.svg"; // Removed import
 
 // --- Configuration ---
-const API_URL = "http://localhost:3001/auth";
+const API_URL = API_CONFIG.AUTH;
 
 // --- Main AuthFlow Component ---
 export default function AuthFlow({ onAuthSuccess }) {
@@ -55,7 +56,6 @@ export default function AuthFlow({ onAuthSuccess }) {
   const handleRegistrationSuccess = (token) => {
     localStorage.setItem("token", token);
     onAuthSuccess(token);
-    
   };
 
   // Render the current step
