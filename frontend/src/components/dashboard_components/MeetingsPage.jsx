@@ -4,7 +4,7 @@ import { Link2, Calendar, Hash, CalendarDays } from "lucide-react";
 
 const MeetingsPage = () => {
   return (
-    <>
+    <div className="p-6 sm:p-8">
       <h1 className="text-2xl font-semibold mb-6 text-gray-100">Meet</h1>
 
       {/* Meeting Actions */}
@@ -65,7 +65,7 @@ const MeetingsPage = () => {
           <div className="h-40 bg-gradient-to-b from-transparent to-[#242424] flex items-end justify-center"></div>
         </div>
       </section>
-    </>
+    </div>
   );
 };
 

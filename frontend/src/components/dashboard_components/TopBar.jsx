@@ -37,7 +37,7 @@ export const TopBar = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="h-14 bg-[#0f0f0f] border-b border-[#1f1f1f] grid grid-cols-3 items-center px-4 relative">
+    <header className="h-14 bg-[#0A0A0A]  grid grid-cols-3 items-center px-4 relative">
       {/* Left section */}
       <div className="flex items-center justify-start gap-3">
         <button
