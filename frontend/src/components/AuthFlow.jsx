@@ -48,13 +48,15 @@ export default function AuthFlow({ onAuthSuccess }) {
   };
 
   // --- Handlers for authentication success ---
-  const handleLoginSuccess = (token) => {
+  const handleLoginSuccess = (token, email) => {
     localStorage.setItem("token", token);
+    localStorage.setItem("email", email);
     onAuthSuccess(token);
   };
 
-  const handleRegistrationSuccess = (token) => {
+  const handleRegistrationSuccess = (token, email) => {
     localStorage.setItem("token", token);
+    localStorage.setItem("email", email);
     onAuthSuccess(token);
   };
 
@@ -320,7 +322,7 @@ function PasswordInput({
       if (!response.ok) {
         throw new Error(data.msg || "Incorrect password.");
       }
-      onLoginSuccess(data.token);
+      onLoginSuccess(data.token, data.email);
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -689,7 +691,7 @@ function RegisterDetailsInput({
           : data.msg || "Failed to register";
         throw new Error(errorMsg);
       }
-      onRegisterSuccess(data.token);
+      onRegisterSuccess(data.token, data.email);
     } catch (err) {
       setError(err.message);
       setLoading(false);

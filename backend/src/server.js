@@ -6,6 +6,8 @@ import envRouter from "./routes/env.js";
 import callsRouter from "./routes/calls.js";
 import calendarRouter from "./routes/calendar.js";
 import AuthenticationRouter from "./routes/auth.js";
+import messagesRoutes from './routes/messages.js';
+import UserRoutes from './routes/UserRoutes.js'
 import { initSocketHandlers } from "./socket/handlers.js";
 import { initCallSignaling } from "./socket/callSignaling.js";
 import { config } from "./config/config.js";
@@ -50,8 +52,15 @@ app.use("/calls", callsRouter);
 // Calendar API routes
 app.use("/auth", AuthenticationRouter);
 
+// User API routes
+app.use("/user", UserRoutes);
+
 // Calendar API routes
 app.use("/calendar", calendarRouter);
+
+
+// Calendar API routes
+app.use("/api/messages", messagesRoutes);
 
 // Initialize Socket.IO handlers
 initSocketHandlers(io);
