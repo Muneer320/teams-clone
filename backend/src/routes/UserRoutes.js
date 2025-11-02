@@ -280,6 +280,7 @@ router.post("/leave-community", async (req, res) => {
    🔍 8️⃣ SEARCH USERS
 =========================== */
 router.get("/search", async (req, res) => {
+
   const { query } = req.query;
 
   if (!query || query.trim() === "")

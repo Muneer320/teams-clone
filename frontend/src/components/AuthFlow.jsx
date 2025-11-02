@@ -49,6 +49,7 @@ export default function AuthFlow({ onAuthSuccess }) {
 
   // --- Handlers for authentication success ---
   const handleLoginSuccess = (token, email) => {
+    console.log(token)
     localStorage.setItem("token", token);
     localStorage.setItem("email", email);
     onAuthSuccess(token);
