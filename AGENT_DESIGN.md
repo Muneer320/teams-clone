@@ -22,11 +22,13 @@ The TeamsClone-RL agent system provides both **rule-based** and **learning-based
 ### TaskAgent (Rule-Based)
 
 The `TaskAgent` class implements a rule-based policy that selects actions based on:
+
 - Current task type
 - Environment state features
 - Predefined task completion criteria
 
 **Key Characteristics:**
+
 - Deterministic behavior
 - Fast inference (<1ms)
 - Interpretable decisions
@@ -49,14 +51,14 @@ def select_action(state):
     task_type = state["taskContext"]["type"]
     step_count = state["stepCount"]
     messages = state["messages"]
-    
+
     # 2. Check task-specific rules
     if task_type == "greeting_response":
         return handle_greeting_task(state)
     elif task_type == "meeting_setup":
         return handle_meeting_task(state)
     # ... other task types
-    
+
     # 3. Default fallback
     return {"type": "send_message", "content": "I'm processing..."}
 ```
@@ -87,7 +89,7 @@ def extract_features(state):
         "user_status": state["userPresence"],
         "in_call": state["activeCall"] is not None,
         "task_progress": state["taskContext"]["progress"],
-        "recent_message_count": len([m for m in state["messages"] 
+        "recent_message_count": len([m for m in state["messages"]
                                       if recent(m["timestamp"])]),
     }
 ```
@@ -95,6 +97,7 @@ def extract_features(state):
 ### Context Awareness
 
 The agent maintains a short-term memory of:
+
 - Last 5 actions taken
 - Recent messages (last 10)
 - Task completion history
@@ -117,11 +120,11 @@ The agent maintains a short-term memory of:
 def process_reward(reward, done):
     # Update reward history
     self.reward_buffer.append(reward)
-    
+
     # Detect reward patterns
     if reward > 5.0:
         self.high_reward_actions.append(self.last_action)
-    
+
     # Adjust strategy if rewards declining
     if np.mean(self.reward_buffer[-5:]) < 0:
         self.exploration_rate += 0.1
@@ -136,10 +139,11 @@ def process_reward(reward, done):
 **Goal**: Respond appropriately to incoming greetings
 
 **Policy**:
+
 ```python
 def handle_greeting_task(state):
     messages = state["messages"]
-    
+
     # Check for unresponded greeting
     for msg in reversed(messages):
         if is_greeting(msg["content"]) and not has_response(msg):
@@ -147,7 +151,7 @@ def handle_greeting_task(state):
                 "type": "send_message",
                 "content": generate_greeting_response(msg)
             }
-    
+
     # Wait if no greeting yet
     return {"type": "wait"}
 ```
@@ -161,10 +165,11 @@ def handle_greeting_task(state):
 **Goal**: Schedule a meeting within specified time window
 
 **Policy**:
+
 ```python
 def handle_meeting_task(state):
     task = state["taskContext"]
-    
+
     if task["progress"] == 0:
         # Start by asking for availability
         return {
@@ -195,11 +200,12 @@ def handle_meeting_task(state):
 **Goal**: Switch to specified channel and send update
 
 **Policy**:
+
 ```python
 def handle_channel_task(state):
     target_channel = state["taskContext"]["target_channel"]
     current = state["currentChannel"]
-    
+
     if current != target_channel:
         return {
             "type": "switch_channel",
@@ -262,7 +268,7 @@ class TaskAgent:
             "message_reaction": self._handle_reaction,
             "status_update": self._handle_status
         }
-    
+
     def select_action(self, state):
         # Main entry point for action selection
         task_type = state["taskContext"]["type"]
@@ -270,7 +276,7 @@ class TaskAgent:
         action = handler(state)
         self.action_history.append(action)
         return action
-    
+
     def update(self, reward, done):
         # Process feedback from environment
         self.reward_buffer.append(reward)
@@ -303,7 +309,7 @@ class LSTMAgent(TaskAgent):
         super().__init__()
         self.lstm = nn.LSTM(input_size=10, hidden_size=64, num_layers=2)
         self.hidden = None
-    
+
     def select_action(self, state):
         features = self.extract_features(state)
         output, self.hidden = self.lstm(features, self.hidden)
@@ -333,7 +339,7 @@ class MultiTaskAgent:
 ```
 High-Level Policy: "Schedule meeting"
     ↓
-Low-Level Actions: 
+Low-Level Actions:
     1. Send message asking availability
     2. Parse response
     3. Propose time
@@ -380,12 +386,12 @@ class MAMLAgent:
 
 ### Benchmarking
 
-| Agent Type | Success Rate | Avg Steps | Avg Reward |
-|-----------|--------------|-----------|------------|
-| Random | 15% | 45 | -2.3 |
-| Rule-Based | 85% | 12 | +8.5 |
-| PPO (100k steps) | 78% | 15 | +7.2 |
-| PPO (1M steps) | 92% | 10 | +9.8 |
+| Agent Type       | Success Rate | Avg Steps | Avg Reward |
+| ---------------- | ------------ | --------- | ---------- |
+| Random           | 15%          | 45        | -2.3       |
+| Rule-Based       | 85%          | 12        | +8.5       |
+| PPO (100k steps) | 78%          | 15        | +7.2       |
+| PPO (1M steps)   | 92%          | 10        | +9.8       |
 
 ---
 

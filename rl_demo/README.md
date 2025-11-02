@@ -19,6 +19,7 @@ python run_demo.py
 ```
 
 **With options:**
+
 ```bash
 # Specify custom backend URL
 python run_demo.py --url http://localhost:5000
@@ -28,6 +29,7 @@ python run_demo.py --task meeting_setup
 ```
 
 **Available tasks:**
+
 - `greeting_response` (default)
 - `meeting_setup`
 - `channel_navigation`
@@ -83,11 +85,13 @@ pip install matplotlib numpy requests
 ## 📚 Usage Examples
 
 ### Example 1: Quick Demo
+
 ```bash
 python run_demo.py
 ```
 
 Output:
+
 ```
 🚀 TeamsClone-RL Demo
 ====================================
@@ -103,6 +107,7 @@ Step 1:
 ```
 
 ### Example 2: Plot Custom Data
+
 ```python
 # Create your own episode data
 episodes = []
@@ -157,13 +162,16 @@ print(f"Reward: {result['total_reward']}")
 ## 🐛 Troubleshooting
 
 **Error: Connection refused**
+
 - Make sure backend server is running: `cd backend && npm start`
 
 **Error: Module not found**
+
 - Install dependencies: `pip install matplotlib requests numpy`
 - Add python_agent to path or run from project root
 
 **Empty plots**
+
 - Check JSON format matches expected structure
 - Verify episode data has required fields
 
@@ -171,13 +179,13 @@ print(f"Reward: {result['total_reward']}")
 
 Typical performance metrics:
 
-| Task Type | Avg Reward | Avg Steps | Success Rate |
-|-----------|------------|-----------|--------------|
-| Greeting Response | 8.5 | 11 | 95% |
-| Meeting Setup | 12.3 | 17 | 85% |
-| Channel Navigation | 7.2 | 8 | 98% |
-| Message Reaction | 6.5 | 6 | 99% |
-| Status Update | 5.1 | 5 | 100% |
+| Task Type          | Avg Reward | Avg Steps | Success Rate |
+| ------------------ | ---------- | --------- | ------------ |
+| Greeting Response  | 8.5        | 11        | 95%          |
+| Meeting Setup      | 12.3       | 17        | 85%          |
+| Channel Navigation | 7.2        | 8         | 98%          |
+| Message Reaction   | 6.5        | 6         | 99%          |
+| Status Update      | 5.1        | 5         | 100%         |
 
 ## 🤝 Contributing
 

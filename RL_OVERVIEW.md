@@ -29,6 +29,7 @@ The TeamsClone-RL system creates a closed-loop reinforcement learning environmen
 ## 🔄 Interaction Flow
 
 ### 1. **Episode Initialization**
+
 ```
 Agent → POST /env/reset → Backend
                           Backend creates new episode
@@ -36,6 +37,7 @@ Agent → POST /env/reset → Backend
 ```
 
 ### 2. **Action Execution Loop**
+
 ```
 Agent → GET /env/state → Backend returns current state
 Agent processes state
@@ -49,6 +51,7 @@ Agent → POST /env/step → Backend executes action
 ```
 
 ### 3. **Episode Termination**
+
 ```
 When done = true:
   Agent logs episode metrics
@@ -59,23 +62,23 @@ When done = true:
 
 ### REST API Endpoints
 
-| Endpoint | Method | Purpose | Request | Response |
-|----------|--------|---------|---------|----------|
-| `/env/reset` | POST | Start new episode | `{task_type, user_id}` | `{episode_id, state, task_description}` |
-| `/env/state` | GET | Query current state | Query params | `{state, episode_id, step_count}` |
-| `/env/step` | POST | Execute action | `{action: {type, ...}}` | `{state, reward, done, info}` |
-| `/env/actions` | GET | List valid actions | None | `{action_types: [...]}` |
-| `/env/stats` | GET | Get episode stats | Query params | `{total_episodes, avg_reward, ...}` |
+| Endpoint       | Method | Purpose             | Request                 | Response                                |
+| -------------- | ------ | ------------------- | ----------------------- | --------------------------------------- |
+| `/env/reset`   | POST   | Start new episode   | `{task_type, user_id}`  | `{episode_id, state, task_description}` |
+| `/env/state`   | GET    | Query current state | Query params            | `{state, episode_id, step_count}`       |
+| `/env/step`    | POST   | Execute action      | `{action: {type, ...}}` | `{state, reward, done, info}`           |
+| `/env/actions` | GET    | List valid actions  | None                    | `{action_types: [...]}`                 |
+| `/env/stats`   | GET    | Get episode stats   | Query params            | `{total_episodes, avg_reward, ...}`     |
 
 ### Socket.IO Events (Real-time)
 
-| Event | Direction | Purpose |
-|-------|-----------|---------|
-| `env:state-update` | Backend → Frontend | Broadcast state changes |
-| `env:episode-start` | Backend → Frontend | Notify new episode |
-| `env:episode-end` | Backend → Frontend | Notify episode completion |
-| `message:new` | Backend → Frontend | New message in chat |
-| `presence:update` | Backend → Frontend | User status change |
+| Event               | Direction          | Purpose                   |
+| ------------------- | ------------------ | ------------------------- |
+| `env:state-update`  | Backend → Frontend | Broadcast state changes   |
+| `env:episode-start` | Backend → Frontend | Notify new episode        |
+| `env:episode-end`   | Backend → Frontend | Notify episode completion |
+| `message:new`       | Backend → Frontend | New message in chat       |
+| `presence:update`   | Backend → Frontend | User status change        |
 
 ## 🧠 State Representation
 
@@ -119,34 +122,40 @@ Available actions:
 ## 🏆 Reward Structure
 
 ### Positive Rewards
+
 - **Task completion**: +10.0
 - **Appropriate message**: +2.0
 - **Timely response**: +1.5
 - **Helpful reaction**: +0.5
 
 ### Negative Rewards
+
 - **Off-topic message**: -1.0
 - **Ignored message**: -0.5
 - **Timeout**: -2.0
 
 ### Time Penalty
+
 - Each step: -0.1 (encourages efficiency)
 
 ## 🔧 Components
 
 ### Backend (Node.js + Express + Socket.IO)
+
 - Manages episode lifecycle
 - Computes rewards
 - Maintains environment state
 - Broadcasts updates to frontend
 
 ### Frontend (React + Vite + TailwindCSS)
+
 - Visualizes agent actions in real-time
 - Displays messages, presence, calls
 - Shows task progress
 - Provides developer debugging UI
 
 ### Python Agent (TeamsEnvClient + TaskAgent)
+
 - Connects to backend via REST
 - Processes observations
 - Selects actions using policy
@@ -155,6 +164,7 @@ Available actions:
 ## 🚀 Getting Started
 
 ### Start Backend
+
 ```bash
 cd backend
 npm install
@@ -163,6 +173,7 @@ npm start
 ```
 
 ### Start Frontend (optional, for visualization)
+
 ```bash
 cd frontend
 npm install
@@ -171,6 +182,7 @@ npm run dev
 ```
 
 ### Run Agent
+
 ```python
 from python_agent.client import TeamsEnvClient
 from python_agent.agent import TaskAgent
@@ -191,6 +203,7 @@ while not done:
 ## 📊 Metrics and Evaluation
 
 The system tracks:
+
 - **Episode rewards** (cumulative)
 - **Step counts** (episode length)
 - **Task completion rate**

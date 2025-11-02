@@ -8,13 +8,16 @@ TeamsClone-RL is a realistic web clone of Microsoft Teams designed to serve as a
 
 This project provides:
 
-- ✅ **Realistic Teams UI/UX** - Fully functional web interface with real-time chat
+- ✅ **Realistic Teams UI/UX** - Fully functional web interface with real-time chat and video calls
+- ✅ **Complete Authentication System** - Microsoft-style auth flow with OTP verification
 - ✅ **Production-Ready RL Environment** - Complete Gym-like API with multi-episode support
 - ✅ **5 Task Types** - Diverse objectives for comprehensive agent training
 - ✅ **Intelligent Baseline Agent** - Task-specific policies achieving 100% completion
 - ✅ **Multi-user Support** - Real-time collaboration via Socket.IO
+- ✅ **Video Calling** - WebRTC-based video conferencing with screen sharing
+- ✅ **Calendar System** - Complete meeting scheduling with 20+ endpoints
 - ✅ **Sophisticated Rewards** - Multi-level reward shaping (base, bonuses, penalties, task completion)
-- ✅ **Python Client & Test Suite** - Comprehensive client library with full test coverage
+- ✅ **Python Client & Demos** - Comprehensive client library with Jupyter notebooks and CLI tools
 
 ## 🏗️ Architecture
 
@@ -88,9 +91,29 @@ python demo.py
 
 ## 📚 Documentation
 
+### Core Documentation
+
+- **[Quick Start Guide](./QUICKSTART.md)** - Get up and running in 5 minutes
+- **[API Reference](./API_ENDPOINTS.md)** - Complete list of all 41 endpoints
+- **[API Quick Reference](./API_QUICK_REFERENCE.md)** - Quick lookup with request/response examples
+
+### Reinforcement Learning
+
+- **[RL Overview](./RL_OVERVIEW.md)** - System architecture and interaction flow
 - **[RL Guide](./docs/RL_GUIDE.md)** - Complete guide with usage examples and tips
+- **[Agent Design](./AGENT_DESIGN.md)** - Agent architecture and task policies
 - **[Evaluation Guide](./docs/EVALUATION.md)** - Reward design, metrics, evaluation protocol
-- **[API Reference](./docs/API.md)** - Complete API documentation
+- **[Demo Tools](./rl_demo/README.md)** - CLI tools and visualization scripts
+
+### Feature-Specific Docs
+
+- **[Calendar API](./docs/CALENDAR_API.md)** - Complete calendar system documentation
+- **[Calls API](./docs/CALLS_API.md)** - Video calling API reference
+- **[Python Agent](./python_agent/README.md)** - Python client library guide
+
+### Notebooks
+
+- **[RL Training Notebook](./notebooks/RL_Train.ipynb)** - Train PPO agents with Stable-Baselines3
 
 ## 🎮 RL Environment API
 
@@ -178,42 +201,127 @@ See [RL_GUIDE.md](./docs/RL_GUIDE.md) for detailed reward design and strategies.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, Vite, TailwindCSS, Socket.IO Client
-- **Backend**: Node.js, Express, Socket.IO
-- **RL Client**: Python, requests
-- **Deployment**: Vercel (frontend), Render/Railway (backend)
+### Frontend
+
+- **Framework**: React 18.2 with Vite 5.0
+- **Styling**: TailwindCSS 3.3
+- **Real-time**: Socket.IO Client
+- **Video**: WebRTC for peer-to-peer video calls
+- **State Management**: React Hooks (useState, useEffect, useRef)
+
+### Backend
+
+- **Runtime**: Node.js 22
+- **Framework**: Express 4.18
+- **Real-time**: Socket.IO 4.8
+- **Database**: SQLite3 with sqlite async wrapper
+- **Authentication**: JWT tokens with bcrypt
+- **Validation**: express-validator
+
+### Python Agent
+
+- **HTTP Client**: requests library
+- **RL Framework**: Stable-Baselines3 (optional)
+- **Visualization**: Matplotlib, NumPy
+- **Environment**: Gym-compatible wrapper
+
+### Deployment
+
+- **Frontend**: Vercel/Netlify ready
+- **Backend**: Render.com configured (see render.yaml)
+- **Database**: SQLite for development, MySQL/PostgreSQL for production
 
 ## 📁 Project Structure
 
 ```
 teams-clone/
-├── backend/              # Node.js backend
+├── backend/                 # Node.js backend
 │   ├── src/
-│   │   ├── server.js    # Main server
-│   │   ├── routes/      # API routes
-│   │   ├── models/      # Environment logic
-│   │   ├── socket/      # Socket.IO handlers
-│   │   └── config/      # Configuration
+│   │   ├── server.js       # Main server with Socket.IO
+│   │   ├── routes/         # API routes (env, calendar, calls, auth)
+│   │   │   ├── env.js      # RL environment endpoints
+│   │   │   ├── calendar.js # Calendar/meeting system
+│   │   │   ├── calls.js    # Video call management
+│   │   │   └── auth.js     # Authentication (commented out)
+│   │   ├── models/         # Data models & business logic
+│   │   │   ├── environment.js  # RL environment state
+│   │   │   └── database.js     # SQLite connection
+│   │   ├── socket/         # Socket.IO event handlers
+│   │   │   ├── handlers.js # Chat & presence events
+│   │   │   └── callHandlers.js # Video call signaling
+│   │   ├── services/       # Business logic services
+│   │   │   └── envService.js   # Environment service
+│   │   └── config/         # Configuration
+│   ├── data/               # SQLite database files
 │   └── package.json
 │
-├── frontend/            # React frontend
+├── frontend/               # React frontend
 │   ├── src/
-│   │   ├── App.jsx      # Main component
-│   │   └── components/  # UI components
+│   │   ├── App.jsx         # Main app with tabs
+│   │   ├── main.jsx        # Entry point
+│   │   ├── components/
+│   │   │   ├── AuthFlow.jsx    # Complete auth UI
+│   │   │   ├── ChatTab.jsx     # Chat interface
+│   │   │   ├── CalendarTab.jsx # Calendar UI
+│   │   │   ├── CallsTab.jsx    # Video calls UI
+│   │   │   └── RLTestTab.jsx   # RL testing interface
+│   │   └── assets/         # Images and static files
 │   └── package.json
 │
-├── python_agent/            # Python RL agents
-│   ├── client.py            # Environment client
-│   ├── agent.py             # Task-based agent
-│   ├── test.py              # Test suite
-│   ├── demo.py              # Interactive demo
-│   └── requirements.txt
+├── python_agent/           # Python RL agents
+│   ├── client.py           # Environment HTTP client
+│   ├── agent.py            # Rule-based task agent
+│   ├── test.py             # Comprehensive test suite
+│   ├── demo.py             # Interactive CLI demo
+│   └── README.md           # Python client documentation
 │
-└── docs/                    # Documentation
-    ├── RL_GUIDE.md          # RL guide
-    ├── EVALUATION.md        # Evaluation metrics
-    └── API.md               # API reference
+├── notebooks/              # Jupyter notebooks
+│   └── RL_Train.ipynb      # PPO training with Stable-Baselines3
+│
+├── rl_demo/                # Demo and visualization tools
+│   ├── run_demo.py         # CLI demo runner
+│   ├── plot_results.py     # Episode visualization
+│   ├── sample_episodes.json # Example data
+│   └── README.md           # Demo tools guide
+│
+├── docs/                   # Detailed documentation
+│   ├── API.md              # Complete API reference
+│   ├── RL_GUIDE.md         # RL environment guide
+│   ├── EVALUATION.md       # Reward & metrics
+│   ├── CALENDAR_API.md     # Calendar endpoints
+│   ├── CALLS_API.md        # Calls endpoints
+│   └── CALENDAR_*.md       # Calendar implementation docs
+│
+├── tests/                  # Test suite
+│   ├── test_rl_complete.py     # Comprehensive RL tests
+│   ├── test_all_endpoints.py   # All 41 API endpoint tests
+│   └── README.md               # Test documentation
+├── RL_OVERVIEW.md          # System architecture
+├── AGENT_DESIGN.md         # Agent design patterns
+├── API_ENDPOINTS.md        # All 41 endpoints list
+├── API_QUICK_REFERENCE.md  # Quick API lookup
+├── QUICKSTART.md           # 5-minute setup guide
+└── README.md               # This file
 ```
+
+## 🧪 Testing
+
+Comprehensive test suite available in the `tests/` folder.
+
+**Quick test:**
+
+```bash
+python tests/test_rl_complete.py
+```
+
+**Test coverage:**
+
+- ✅ 8/8 RL API endpoints
+- ✅ 7/7 Python client functions
+- ✅ 2/2 TaskAgent methods
+- ⚠️ Calendar & Calls APIs (manual testing)
+
+See [`tests/README.md`](./tests/README.md) for detailed testing documentation.
 
 ## 🤝 Contributing
 
@@ -242,20 +350,10 @@ If you use TeamsClone-RL in your research, please cite:
 
 ## 🐛 Known Issues
 
-- Message persistence not implemented (in-memory only)
+- Message persistence using SQLite (no MySQL yet for production)
 - Limited to single-server deployment (no horizontal scaling)
-- Call simulation is UI-only (no WebRTC)
-
-## 🚧 Future Work
-
-- [ ] Neural network agents (DQN, PPO, A3C, SAC)
-- [ ] Multi-agent environments with competitive/cooperative scenarios
-- [ ] WebSocket streaming for real-time training visualization
-- [ ] Frontend dashboard for agent monitoring
-- [ ] Custom task creation API
-- [ ] Integration with popular RL frameworks (Stable-Baselines3, RLlib)
-- [ ] Curriculum learning and meta-learning experiments
-- [ ] Add file sharing and calendar scheduling simulations
+- WebRTC video calls functional but peer-to-peer connections need improvement
+- Auth system uses dummy OTP (123456) for demo purposes
 
 ## 🎯 Key Metrics & Performance
 

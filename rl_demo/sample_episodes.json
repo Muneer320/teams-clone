@@ -1,82 +1,119 @@
 [
-  {
-    "episode_num": 1,
-    "task_type": "greeting_response",
-    "total_reward": 8.5,
-    "steps": 12,
-    "completed": true,
-    "actions": ["send_message", "send_message", "wait", "send_message"]
-  },
-  {
-    "episode_num": 2,
-    "task_type": "greeting_response",
-    "total_reward": 9.2,
-    "steps": 10,
-    "completed": true,
-    "actions": ["send_message", "wait", "send_message"]
-  },
-  {
-    "episode_num": 3,
-    "task_type": "meeting_setup",
-    "total_reward": 12.8,
-    "steps": 18,
-    "completed": true,
-    "actions": ["send_message", "send_message", "schedule_meeting", "send_message"]
-  },
-  {
-    "episode_num": 4,
-    "task_type": "channel_navigation",
-    "total_reward": 7.1,
-    "steps": 8,
-    "completed": true,
-    "actions": ["switch_channel", "send_message"]
-  },
-  {
-    "episode_num": 5,
-    "task_type": "greeting_response",
-    "total_reward": 8.9,
-    "steps": 11,
-    "completed": true,
-    "actions": ["send_message", "send_message"]
-  },
-  {
-    "episode_num": 6,
-    "task_type": "message_reaction",
-    "total_reward": 6.5,
-    "steps": 6,
-    "completed": true,
-    "actions": ["react_to_message", "send_message"]
-  },
-  {
-    "episode_num": 7,
-    "task_type": "meeting_setup",
-    "total_reward": 11.3,
-    "steps": 16,
-    "completed": true,
-    "actions": ["send_message", "send_message", "schedule_meeting"]
-  },
-  {
-    "episode_num": 8,
-    "task_type": "status_update",
-    "total_reward": 5.2,
-    "steps": 5,
-    "completed": true,
-    "actions": ["set_status", "send_message"]
-  },
-  {
-    "episode_num": 9,
-    "task_type": "greeting_response",
-    "total_reward": 9.5,
-    "steps": 9,
-    "completed": true,
-    "actions": ["send_message", "send_message"]
-  },
-  {
-    "episode_num": 10,
-    "task_type": "channel_navigation",
-    "total_reward": 7.8,
-    "steps": 7,
-    "completed": true,
-    "actions": ["switch_channel", "send_message", "send_message"]
-  }
+    {
+        "episode_num": 1,
+        "task_type": "greeting_response",
+        "total_reward": 8.5,
+        "steps": 12,
+        "completed": true,
+        "actions": [
+            "send_message",
+            "send_message",
+            "wait",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 2,
+        "task_type": "greeting_response",
+        "total_reward": 9.2,
+        "steps": 10,
+        "completed": true,
+        "actions": [
+            "send_message",
+            "wait",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 3,
+        "task_type": "meeting_setup",
+        "total_reward": 12.8,
+        "steps": 18,
+        "completed": true,
+        "actions": [
+            "send_message",
+            "send_message",
+            "schedule_meeting",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 4,
+        "task_type": "channel_navigation",
+        "total_reward": 7.1,
+        "steps": 8,
+        "completed": true,
+        "actions": [
+            "switch_channel",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 5,
+        "task_type": "greeting_response",
+        "total_reward": 8.9,
+        "steps": 11,
+        "completed": true,
+        "actions": [
+            "send_message",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 6,
+        "task_type": "message_reaction",
+        "total_reward": 6.5,
+        "steps": 6,
+        "completed": true,
+        "actions": [
+            "react_to_message",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 7,
+        "task_type": "meeting_setup",
+        "total_reward": 11.3,
+        "steps": 16,
+        "completed": true,
+        "actions": [
+            "send_message",
+            "send_message",
+            "schedule_meeting"
+        ]
+    },
+    {
+        "episode_num": 8,
+        "task_type": "status_update",
+        "total_reward": 5.2,
+        "steps": 5,
+        "completed": true,
+        "actions": [
+            "set_status",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 9,
+        "task_type": "greeting_response",
+        "total_reward": 9.5,
+        "steps": 9,
+        "completed": true,
+        "actions": [
+            "send_message",
+            "send_message"
+        ]
+    },
+    {
+        "episode_num": 10,
+        "task_type": "channel_navigation",
+        "total_reward": 7.8,
+        "steps": 7,
+        "completed": true,
+        "actions": [
+            "switch_channel",
+            "send_message",
+            "send_message"
+        ]
+    }
 ]

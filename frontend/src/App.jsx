@@ -1,47 +1,129 @@
-import React, { useState } from 'react';
-import AuthFlow from './components/AuthFlow';
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 
-function App() {
+import HomePage from "./components/HomePage";
+import AuthFlow from "./components/AuthFlow";
+import Dashboard from "./components/Dashboard";
+import NotFound from "./components/NotFound";
 
+// ✅ This small component handles logout automatically
+function Logout({ onLogout }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    onLogout(); // Clear token, set state, etc.
+    navigate("/login"); // Redirect after logout
+  }, [onLogout, navigate]);
+
+  return (
+    <div className="flex items-center justify-center h-screen text-foreground">
+      <p>Logging you out...</p>
+    </div>
+  );
+}
+
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
+  const navigate = useNavigate();
 
+  // ✅ Check for saved token when app loads
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      setToken(savedToken);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // ✅ Handle login success
   const handleAuthSuccess = (newToken) => {
     setToken(newToken);
     setIsAuthenticated(true);
-    // You would likely redirect to the main app here
+    localStorage.setItem("token", newToken);
     console.log("Authentication successful! Token:", newToken);
+    navigate("/dashboard");
   };
 
+  // ✅ Handle logout
   const handleLogout = () => {
     setToken(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     console.log("Logged out.");
   };
 
   return (
     <div className="App">
-      {isAuthenticated ? (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to Teams!</h1>
-          <p className="text-lg mb-6">You are now logged in.</p>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
-          >
-            Logout
-          </button>
-        </div>
-      ) : (
+      <Routes>
+        {/* Public routes */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <HomePage />
+            )
+          }
+        />
 
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <AuthFlow onAuthSuccess={handleAuthSuccess} />
+            )
+          }
+        />
 
-        <AuthFlow onAuthSuccess={handleAuthSuccess} />
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <AuthFlow onAuthSuccess={handleAuthSuccess} />
+            )
+          }
+        />
 
-        // <MicrosoftLoginClone/>
-      )}
+        {/* Protected routes */}
+        <Route
+          path="/dashboard/*"
+          element={
+            isAuthenticated ? (
+              <Dashboard onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
+        {/* ✅ Logout route */}
+        <Route path="/logout" element={<Logout onLogout={handleLogout} />} />
+
+        {/* 404 fallback */}
+        {/* <Route path="*" element={<NotFound />} /> */}
+      </Routes>
     </div>
   );
 }
 
-export default App;
+// function App() {
+//   return (
+//     <Router>
+//       <AppContent />
+//      </Router>
+//   );
+// }
+
+export default AppContent;
