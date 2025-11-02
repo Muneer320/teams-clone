@@ -47,13 +47,32 @@ This project provides:
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Docker (Recommended) 🐳
+
+The easiest way to get started is with Docker:
+
+```bash
+# Start both frontend and backend
+docker-compose up
+
+# Or run in background
+docker-compose up -d
+```
+
+- **Frontend**: `http://localhost:5173`
+- **Backend**: `http://localhost:3001`
+
+See [DOCKER_README.md](./DOCKER_README.md) for detailed Docker instructions.
+
+### Option 2: Manual Setup
+
+#### Prerequisites
 
 - Node.js 16+
 - Python 3.8+
 - npm or yarn
 
-### 1. Backend Setup
+#### 1. Backend Setup
 
 ```bash
 cd backend
@@ -63,7 +82,7 @@ npm run dev
 
 Backend runs on `http://localhost:3001`
 
-### 2. Frontend Setup
+#### 2. Frontend Setup
 
 ```bash
 cd frontend
@@ -73,7 +92,7 @@ npm run dev
 
 Frontend runs on `http://localhost:5173`
 
-### 3. Python Agent Setup
+#### 3. Python Agent Setup
 
 ```bash
 cd python_agent

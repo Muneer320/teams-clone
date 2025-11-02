@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: teams-clone-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - CORS_ORIGIN=http://localhost:5173
+      - NODE_ENV=development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/database:/app/database
+    networks:
+      - teams-clone-network
+    restart: unless-stopped
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: teams-clone-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+      - VITE_SOCKET_URL=http://localhost:3001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - teams-clone-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  teams-clone-network:
+    driver: bridge
