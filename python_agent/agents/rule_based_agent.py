@@ -9,7 +9,12 @@ This agent uses simple rules to decide actions:
 """
 
 import time
-from rl_client import TeamsEnvClient, ObservationWrapper
+import sys
+import os
+
+# Add parent directory to path to import client
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from client import TeamsEnvClient, ObservationWrapper
 
 
 class RuleBasedAgent:
