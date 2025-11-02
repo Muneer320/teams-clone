@@ -3,14 +3,15 @@ Quick Demo Script for TeamsClone-RL Environment
 Runs a single episode with a rule-based agent and displays actions/rewards.
 """
 
-from client import TeamsEnvClient
-from task_agent import TaskAgent
 import sys
 import os
 import time
 
 # Add python_agent to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'python_agent'))
+
+from client import TeamsEnvClient
+from task_agent import TaskAgent
 
 
 def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
