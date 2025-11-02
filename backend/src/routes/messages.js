@@ -5,7 +5,7 @@ import { verifyToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // 🔒 Apply authentication middleware globally
-router.use(verifyToken);
+// router.use(verifyToken);
 
 /** Helper function to get user ID by email */
 async function getUserIdByEmail(db, email) {
