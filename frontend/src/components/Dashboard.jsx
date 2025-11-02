@@ -9,6 +9,7 @@ import CalenderPage from "./dashboard_components/CalenderPage";
 import ChatsTab from "./dashboard_components/ChatsTab";
 import SettingsPage from "./dashboard_components/SettingsPage";
 import Communities from "./dashboard_components/Communities";
+import ActiveCall from "./ActiveCall";
 
 const Dashboard = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -39,6 +40,7 @@ const Dashboard = () => {
             {/* Full width routes without padding */}
             <Route path="communities" element={<Communities />} />
             <Route path="chat" element={<ChatsTab />} />
+            <Route path="active-call" element={<ActiveCall />} />
 
             {/* Other routes with padding */}
             <Route
