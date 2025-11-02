@@ -46,3 +46,4 @@ export const MessageBubble = ({ message, direction = "left", sender, time, read 
     </div>
   );
 };
+
