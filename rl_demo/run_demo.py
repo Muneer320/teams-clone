@@ -3,6 +3,8 @@ Quick Demo Script for TeamsClone-RL Environment
 Runs a single episode with a rule-based agent and displays actions/rewards.
 """
 
+from task_agent import TaskAgent
+from client import TeamsEnvClient
 import sys
 import os
 import time
@@ -11,8 +13,6 @@ import time
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'python_agent'))
 
 # Now import from python_agent
-from client import TeamsEnvClient
-from task_agent import TaskAgent
 
 
 def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
@@ -53,7 +53,7 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
         # Get current state
         state_response = client.get_state()
         state = state_response.get("state", {})
-        
+
         # Show state summary on first step
         if step_count == 0:
             current_channel = state.get('currentChannel', {})
@@ -79,24 +79,26 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
         # Display step info
         print(f"Step {step_count}:")
         print(f"  🎮 Action: {action.get('type', 'unknown')}")
-        
+
         # Show action payload details
         payload = action.get('payload', {})
         if action.get('type') == 'send_message' and payload.get('content'):
             content = payload['content']
-            print(f"     💬 Message: \"{content[:60]}{'...' if len(content) > 60 else ''}\"")
+            print(
+                f"     💬 Message: \"{content[:60]}{'...' if len(content) > 60 else ''}\"")
         elif action.get('type') == 'react_to_message' and payload.get('reaction'):
             print(f"     👍 Reaction: {payload['reaction']}")
         elif action.get('type') == 'switch_channel' and payload.get('channelId'):
             print(f"     📺 Channel: {payload['channelId']}")
-        
+
         print(f"  🏆 Reward: {reward:+.2f}")
         print(f"  📊 Total Reward: {total_reward:+.2f}")
-        
+
         # Show completion status
         if done:
             if info.get('taskCompleted'):
-                print(f"  🎉 Task Completed! Bonus: +{info.get('taskReward', 0):.1f}")
+                print(
+                    f"  🎉 Task Completed! Bonus: +{info.get('taskReward', 0):.1f}")
             else:
                 print(f"  ⏱️  Episode ended")
 
