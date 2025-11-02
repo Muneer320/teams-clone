@@ -18,7 +18,7 @@ export const Sidebar = ({ isOpen }) => {
   return (
     <aside
       className={cn(
-        "fixed md:static top-0 left-0 h-full w-16 md:w-20 bg-[#0F0F0F] border-r border-[#222] py-4 flex flex-col justify-between transition-transform duration-300 z-50",
+        "fixed md:static top-0 left-0 h-full w-16 md:w-20 bg-[#0A0A0A] border-r border-[#222] py-4 flex flex-col justify-between transition-transform duration-300 z-50",
         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}
     >
