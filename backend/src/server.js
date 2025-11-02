@@ -8,9 +8,14 @@ import calendarRouter from "./routes/calendar.js";
 import AuthenticationRouter from "./routes/auth.js";
 import messagesRoutes from './routes/messages.js';
 import UserRoutes from './routes/UserRoutes.js'
+import ActivityRouter from "./routes/activity.js";
 import { initSocketHandlers } from "./socket/handlers.js";
 import { initCallSignaling } from "./socket/callSignaling.js";
 import { config } from "./config/config.js";
+
+
+import { logActivity } from "./middleware/activityLogger.js";
+
 
 const app = express();
 const httpServer = createServer(app);
@@ -24,6 +29,8 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(logActivity);
+
 
 // Routes
 app.get("/", (req, res) => {
@@ -61,6 +68,10 @@ app.use("/calendar", calendarRouter);
 
 // Calendar API routes
 app.use("/api/messages", messagesRoutes);
+
+
+app.use("/activity", ActivityRouter);
+
 
 // Initialize Socket.IO handlers
 initSocketHandlers(io);

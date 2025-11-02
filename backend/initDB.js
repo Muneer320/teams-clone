@@ -78,9 +78,11 @@
 
 
 import { initMessageTable } from "./src/models/messageModel.js";
+import { initActivityTable } from "./src/models/activityModel.js";
 
 async function initDB() {
   await initMessageTable();
+  await initActivityTable();
   console.log("All tables initialized ✅");
 }
 
