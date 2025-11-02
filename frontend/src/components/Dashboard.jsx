@@ -6,7 +6,7 @@ import { TopBar } from "./dashboard_components/TopBar";
 // Import your sidebar pages
 import MeetingsPage from "./dashboard_components/MeetingsPage";
 import CalenderPage from "./dashboard_components/CalenderPage";
-import ChatArea from "./dashboard_components/chatarea";
+import ChatArea from "./dashboard_components/ChatArea";
 import SettingsPage from "./dashboard_components/SettingsPage";
 
 const Dashboard = () => {
