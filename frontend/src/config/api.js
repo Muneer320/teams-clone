@@ -14,8 +14,8 @@ export const API_CONFIG = {
   CALENDAR: `${API_BASE_URL}/calendar`,
   CALLS: `${API_BASE_URL}/calls`,
   ENV: `${API_BASE_URL}/env`,
-  USER: "http://localhost:3001/user",
-  CHAT: "http://localhost:3001/api/messages", // 👈 since messages live under /api/messages
+  USER: `${API_BASE_URL}/user`,
+  CHAT: `${API_BASE_URL}/api/messages`, // 👈 since messages live under /api/messages
 };
 
 export default API_CONFIG;
