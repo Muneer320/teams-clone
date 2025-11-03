@@ -6,6 +6,13 @@ const router = express.Router();
 
 // 🔒 Apply middleware globally
 router.use(verifyToken);
+// The token owns the operation; a caller-supplied email cannot select another account.
+router.use((req, res, next) => {
+  if (req.body?.user_email !== undefined && req.body.user_email !== req.user.email) {
+    return res.status(403).json({ success: false, error: "Account access denied" });
+  }
+  next();
+});
 
 /** Helper function to get user ID by email */
 async function getUserIdByEmail(db, email) {
@@ -18,6 +25,8 @@ async function getUserIdByEmail(db, email) {
 =========================== */
 router.get("/contacts/:email", async (req, res) => {
   const { email } = req.params;
+  if (email !== req.user.email)
+    return res.status(403).json({ success: false, error: "Account access denied" });
   try {
     const db = await openDB();
     const userId = await getUserIdByEmail(db, email);
@@ -54,6 +63,8 @@ router.get("/contacts/:email", async (req, res) => {
 =========================== */
 router.get("/channels/:email", async (req, res) => {
   const { email } = req.params;
+  if (email !== req.user.email)
+    return res.status(403).json({ success: false, error: "Account access denied" });
   try {
     const db = await openDB();
     const userId = await getUserIdByEmail(db, email);
@@ -128,7 +139,7 @@ router.post("/add-friend", async (req, res) => {
    🧩 4️⃣ JOIN COMMUNITY
 =========================== */
 router.post("/join-community", async (req, res) => {
-  const { community_id, user_email, role } = req.body;
+  const { community_id, user_email } = req.body;
 
   if (!community_id || !user_email)
     return res.status(400).json({ success: false, error: "Missing fields" });
@@ -148,7 +159,7 @@ router.post("/join-community", async (req, res) => {
 
     await db.run(
       `INSERT INTO community_members (community_id, user_id, role) VALUES (?, ?, ?)`,
-      [community_id, userId, role || "member"]
+      [community_id, userId, "member"]
     );
 
     res.json({ success: true, message: "Joined community successfully" });

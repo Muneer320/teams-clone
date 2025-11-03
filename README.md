@@ -1,10 +1,80 @@
-# TeamsClone task simulator
+<div align="center">
 
-This repository contains a Microsoft Teams-inspired interface and a small collaboration-task simulator. The original 2025 hackathon prototype explored whether an agent could learn to navigate chats, channels and meeting invitations. The current demo has five scripted tasks, a rule-based Python baseline, and a Gymnasium adapter around the backend API. There is **no trained RL model or measured training result** in this repository. The simulator uses its own in-memory conversations; it does not control the web app's SQLite chat.
+# TeamsClone
 
-## Run the demo
+**A familiar chat interface. A small playground for collaboration agents.**
 
-Use Node.js 20+, Python 3.13 and npm. In one terminal:
+Explore local direct messages, then run a Python agent through five scripted teamwork tasks. A 2025 hackathon experiment in turning everyday collaboration into an observable environment.
+
+[![Verify demo](https://github.com/Muneer320/teams-clone/actions/workflows/verify.yml/badge.svg)](https://github.com/Muneer320/teams-clone/actions/workflows/verify.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+[Try it locally](#try-it-locally) · [Run an agent](#run-an-agent) · [How-it-works guide](docs/ENVIRONMENT.md)
+
+</div>
+
+![Actual local direct-message conversation between two synthetic demo accounts](docs/images/chat.png)
+
+*The web app, with a real SQLite-backed exchange between Ada and Lin. The task simulator has its own conversations and does not operate this chat.*
+
+## Two ways to explore
+
+| Open the app | Exercise the simulator |
+| --- | --- |
+| Register two local accounts, find a contact and exchange messages. Chat polls every three seconds. | Reset an isolated episode, inspect state, send an action and observe reward and completion. |
+| SQLite stores users, contacts, direct messages and activity. | A rule-based Python baseline and Gymnasium adapter make the five tasks reproducible. |
+| Meet includes a local camera preview. | Greeting, channel exploration, participation, meeting invitation and social tasks have explicit completion rules. |
+
+The original question was whether an agent could learn to navigate a collaboration app. This repository provides the environment and a **hand-written baseline**. It contains no trained policy, learning curve or measured training result.
+
+## Try it locally
+
+With Docker installed, from this repository:
+
+```bash
+docker compose up --build
+```
+
+Open **http://localhost:5173**. Register a disposable account; the UI's verification code is **`123456`**, a demo step that sends no email. Open another browser profile for a second account, then find that account in chat and add it as a contact. Messages persist in the `teams_data` volume.
+
+The API health endpoint is **http://localhost:3001/health**. Compose publishes both services on loopback. Stop with `docker compose down`; that keeps the database volume.
+
+For stable login sessions across restarts, set a long random `JWT_SECRET` in a root `.env` before starting Compose. Without it, the backend generates a fresh signing key at startup and previous sessions expire.
+
+## Run an agent
+
+Keep the backend running. Install Python 3.13 and the client requirements:
+
+```bash
+python -m pip install -r python_agent/requirements.txt
+python rl_demo/run_demo.py --task greeting_response
+python rl_demo/run_demo.py --task channel_explorer
+python rl_demo/run_demo.py --task active_participant
+python rl_demo/run_demo.py --task meeting_joiner
+python rl_demo/run_demo.py --task social_butterfly
+```
+
+Each command creates a real API episode and prints actions, rewards and completion. The rule-based baseline completes these five tasks; this demonstrates the task contract, not learned intelligence. A backend on another port can be selected with `--url http://127.0.0.1:3031`.
+
+Episodes reject obvious shortcuts such as switching back and forth between the same channels or repeating one message. The [environment guide](docs/ENVIRONMENT.md) explains the rules; the [Python notes](python_agent/README.md) cover the 16-value observation and 12 discrete actions.
+
+## How it fits together
+
+```mermaid
+flowchart LR
+  Browser[React chat interface] --> Auth[Authenticated Express routes]
+  Auth --> SQLite[(Local SQLite)]
+  Baseline[Rule-based Python agent] --> Env[Environment HTTP API]
+  Gym[Gymnasium adapter] --> Env
+  Env --> Episodes[Isolated in-memory episodes]
+```
+
+The two paths share a backend process, but they do not share users or messages. The simulator holds at most 100 episodes in memory; restart clears them. A seed selects reproducible message variants and scripted responses.
+
+<details>
+<summary><strong>Develop without Docker and run checks</strong></summary>
+
+Use Node.js 22.12+ or 24, npm and Python 3.13. From the repository root:
 
 ```bash
 npm ci
@@ -12,38 +82,25 @@ npm run install:all
 npm run dev
 ```
 
-The frontend opens at `http://localhost:5173`; the backend health endpoint is `http://localhost:3001/health`. In a second terminal:
-
-```bash
-npm run demo -- --task greeting_response
-npm run demo -- --task channel_explorer
-npm run demo -- --task active_participant
-npm run demo -- --task meeting_joiner
-npm run demo -- --task social_butterfly
-```
-
-Each command starts a real API episode and prints the actions, rewards and completion state. The rule-based baseline completes all five tasks. For a container demo, `docker compose up --build` serves the same frontend and backend on ports 5173 and 3001, bound to localhost. Stop it with `docker compose down`; the SQLite data lives in the `teams_data` volume. Set `JWT_SECRET` in a root `.env` for Compose, or `backend/.env` for local npm runs, before running a long-lived instance. If it is omitted, the backend creates a random key at startup and previous sessions expire on restart.
-
-## What works
-
-- `POST /env/reset`, `POST /env/step`, `GET /env/state?episodeId=...`, task discovery and episode stats. Episodes are isolated, held in memory, and capped at 100. A seed chooses reproducible message variants and scripted replies.
-- Five tasks with validation against obvious reward shortcuts: distinct channels, substantive distinct messages, genuine greeting and meeting invitation, and reactions to distinct other-user messages.
-- A Python HTTP client and Gymnasium wrapper with a 16-value observation and 12 discrete actions. See [Python agent notes](python_agent/README.md).
-- A local React interface with account registration, sign-in, SQLite-backed direct messages, a meeting UI with local camera preview, and a per-user Activity feed. Chat refreshes every three seconds. Registration's `123456` code is explicitly a **demo-only UI step**; no email is sent. Video is a local preview; calls do not transmit media between users.
-- Backend tests, frontend lint/build, and Docker Compose. [Environment rules](docs/ENVIRONMENT.md) describe the task simulator.
-
-## Boundaries
-
-The simulator is separate from the app's real users and messages. The old sample episode JSON, plots, notebooks and unimplemented RL agent were removed because they implied training results that could not be reproduced. Calendar, Settings and hardcoded Communities pages were hidden from navigation. This is a local prototype; the old Vercel homepage has not been verified as a working deployment. The API uses an in-memory episode store and local SQLite, so it is suitable for one local process rather than a multi-instance service.
-
-## Checks
+This starts the frontend on 5173 and backend on 3001. Native backend configuration reads `backend/.env`; `PORT` and comma-separated `CORS_ORIGIN` can change its port and accepted browser origins. Frontend `VITE_API_URL` selects its backend base URL. SQLite is stored at `backend/data/teams_clone.db` when the backend starts in its own directory.
 
 ```bash
 npm test
 npm --prefix frontend run lint
 npm --prefix frontend run build
 python -m pip install -r python_agent/requirements.txt
+python tests/smoke_api.py
 python python_agent/check_env.py
 ```
 
-The browser demo can be opened directly after `npm run dev`. The API supports two-user chat; message routes require a valid bearer token and reject sender spoofing. Do not use real personal accounts or production secrets in this prototype.
+The last two checks need the backend running on port 3001. Backend tests include cross-account contact/channel access and mutation rejection, successful owner operations, and prevention of self-assigned community administrator roles. Simulator tests cover isolation and reward shortcuts. Gymnasium's checker exercises the live HTTP adapter.
+
+</details>
+
+## Prototype boundaries
+
+Use disposable local accounts. Message routes reject sender spoofing; contact and membership operations must belong to the signed-in account. Authenticated directory search intentionally exposes other demo users' profile fields. This is not a production messaging service or a complete community permissions system.
+
+Meet previews the local camera; it does not transmit media between users. Calendar, Settings and the hardcoded Communities pages are hidden from navigation. Some visible controls remain interface prototypes. There is no verified public deployment, distributed episode store or multi-instance database setup.
+
+For a reproducible bug report, include the route or task, steps and expected result in [Issues](https://github.com/Muneer320/teams-clone/issues), with synthetic data and no tokens. Changes to task rules should include a shortcut/isolation test. Original team credits are retained in the [MIT license](LICENSE). This is an independent Microsoft Teams-inspired learning project, not an official Microsoft product.
