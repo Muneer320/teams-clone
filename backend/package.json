@@ -27,8 +27,5 @@
     "sqlite3": "^6.0.1",
     "teamsclone-rl": "file:..",
     "uuid": "^14.0.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
   }
 }

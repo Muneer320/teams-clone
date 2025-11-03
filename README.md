@@ -95,6 +95,8 @@ python python_agent/check_env.py
 
 The last two checks need the backend running on port 3001. Backend tests include cross-account contact/channel access and mutation rejection, successful owner operations, and prevention of self-assigned community administrator roles. Simulator tests cover isolation and reward shortcuts. Gymnasium's checker exercises the live HTTP adapter.
 
+The backend development script uses Node's built-in watch mode. For dependency updates, keep its lockfile synchronized, run `npm --prefix backend audit`, and repeat the account and simulator checks.
+
 </details>
 
 ## Prototype boundaries
