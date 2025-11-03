@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Sidebar } from "./dashboard_components/Sidebar";
 import { TopBar } from "./dashboard_components/TopBar";
+import { ActivityPanel } from "./dashboard_components/ActivityPanel";
 
 // Import your sidebar pages
 import MeetingsPage from "./dashboard_components/MeetingsPage";
@@ -42,6 +43,7 @@ const Dashboard = () => {
             <Route path="chat" element={<ChatsTab />} />
             <Route path="active-call/:callId" element={<ActiveCall />} />
             <Route path="active-call" element={<ActiveCall />} />
+            <Route path="/activity" element={<ActivityPanel />} />
 
             {/* Other routes with padding */}
             <Route

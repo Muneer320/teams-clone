@@ -77,10 +77,12 @@
 // initDB().catch((err) => console.error("❌ DB init error:", err));
 
 
-import { initMessageTable } from "./src/models/messageModel.js";
+// import { initMessageTable } from "./src/models/messageModel.js";
+import { initActivityTable } from "./src/models/activityModel.js";
 
 async function initDB() {
-  await initMessageTable();
+  // await initMessageTable();
+  await initActivityTable();
   console.log("All tables initialized ✅");
 }
 
