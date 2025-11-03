@@ -1,18 +1,17 @@
 {
   "name": "teamsclone-rl-backend",
   "version": "1.0.0",
-  "description": "Backend server for TeamsClone-RL - RL Environment API + Real-time Chat",
+  "description": "Local collaboration task simulator and SQLite chat API",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/*.test.js"
   },
   "keywords": [
-    "reinforcement-learning",
+    "gymnasium",
     "teams-clone",
-    "socket.io",
     "rl-environment"
   ],
   "author": "",
@@ -24,10 +23,10 @@
     "express": "^4.18.2",
     "express-validator": "^7.3.0",
     "jsonwebtoken": "^9.0.2",
-    "socket.io": "^4.8.1",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
-    "uuid": "^9.0.1"
+    "sqlite3": "^6.0.1",
+    "teamsclone-rl": "file:..",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

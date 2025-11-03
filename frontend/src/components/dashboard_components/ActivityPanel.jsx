@@ -8,7 +8,9 @@ export const ActivityPanel = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const response = await fetch(`${API_CONFIG.BASE}/activity/`);
+        const response = await fetch(`${API_CONFIG.BASE}/activity/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token") || ""}` },
+        });
         const data = await response.json();
         if (data.success) {
           setActivities(data.activities);

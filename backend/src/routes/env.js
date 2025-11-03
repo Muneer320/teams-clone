@@ -18,7 +18,7 @@ router.post("/reset", (req, res) => {
       message: "Environment reset successfully",
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.message.includes("task type") || error.message.includes("already exists") ? 400 : 500).json({
       success: false,
       error: error.message,
     });
@@ -31,13 +31,13 @@ router.post("/reset", (req, res) => {
  */
 router.get("/state", (req, res) => {
   try {
-    const state = environment.getState();
+    const state = environment.getState(req.query.episodeId);
     res.json({
       success: true,
       state,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.message.includes("No active episode") ? 404 : 500).json({
       success: false,
       error: error.message,
     });
@@ -51,7 +51,7 @@ router.get("/state", (req, res) => {
  */
 router.post("/step", (req, res) => {
   try {
-    const { action, episodeId } = req.body;
+    const { action, episodeId } = req.body || {};
 
     if (!action || !action.type) {
       return res.status(400).json({
@@ -67,7 +67,7 @@ router.post("/step", (req, res) => {
       ...result,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(error.message.includes("No active episode") ? 404 : 500).json({
       success: false,
       error: error.message,
     });
@@ -80,7 +80,7 @@ router.post("/step", (req, res) => {
  */
 router.get("/actions", (req, res) => {
   try {
-    const actions = environment.getAvailableActions();
+    const actions = environment.getAvailableActions(req.query.episodeId);
     res.json({
       success: true,
       ...actions,

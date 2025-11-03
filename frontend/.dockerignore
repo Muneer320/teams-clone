@@ -1,12 +1,4 @@
 node_modules
-npm-debug.log
-.env
-.env.local
-.env.production
-.git
-.gitignore
-*.md
-.DS_Store
-coverage
 dist
-.vscode
+.env
+npm-debug.log

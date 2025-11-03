@@ -20,7 +20,7 @@ export const MeetingActionCard = ({
             "bg-[#1f1f1f] text-gray-200 border border-[#2a2a2a] hover:bg-[#242424]"
       )}
     >
-      <Icon className="w-5 h-5" />
+      {React.createElement(Icon, { className: "w-5 h-5" })}
       <span className="font-medium">{title}</span>
     </button>
   );

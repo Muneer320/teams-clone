@@ -13,7 +13,6 @@ import meetingGridImg from '../assets/meeting-fr.webp';
 import captionsImg from '../assets/caption-fr.webp'; 
 import emojiImg from '../assets/emoji-fr.webp'; 
 import shareScreenImg from '../assets/share-fr.webp'; 
-import backgroundsImg from '../assets/background-bg.webp'; 
 import linkIcon from '../assets/link-filled-32.svg'; 
 import videoIcon from '../assets/video-filled-32.svg'; 
 import ccIcon from '../assets/closed-caption-filled-32.svg'; 

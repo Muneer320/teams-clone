@@ -3,17 +3,17 @@
     "version": "1.0.0",
     "description": "A High-Fidelity Microsoft Teams Environment for Reinforcement Learning",
     "scripts": {
-        "install:all": "npm run install:backend && npm run install:frontend && npm run install:python",
-        "install:backend": "cd backend && npm install",
-        "install:frontend": "cd frontend && npm install",
-        "install:python": "cd python_agent && pip install -r requirements.txt",
+        "install:all": "npm run install:backend && npm run install:frontend",
+        "install:backend": "npm --prefix backend ci",
+        "install:frontend": "npm --prefix frontend ci",
         "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
         "dev:backend": "cd backend && npm run dev",
         "dev:frontend": "cd frontend && npm run dev",
         "start:backend": "cd backend && npm start",
         "start:frontend": "cd frontend && npm run dev",
         "build:frontend": "cd frontend && npm run build",
-        "test:agent": "cd python_agent && python agents/random_agent.py"
+        "test": "npm --prefix backend test",
+        "demo": "python rl_demo/run_demo.py"
     },
     "keywords": [
         "reinforcement-learning",
@@ -22,7 +22,7 @@
         "rl-environment",
         "hackathon"
     ],
-    "author": "Your Team",
+    "author": "muneer320",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -31,11 +31,5 @@
     "devDependencies": {
         "concurrently": "^8.2.0"
     },
-    "dependencies": {
-        "@tailwindcss/cli": "^4.1.16",
-        "dotenv": "^17.2.3",
-        "mysql2": "^3.15.3",
-        "tailwindcss": "^4.1.16",
-        "tailwindcss-animate": "^1.0.7"
-    }
+    "dependencies": {}
 }

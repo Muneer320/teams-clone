@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Backend Service
   backend:
@@ -8,15 +6,14 @@ services:
       dockerfile: Dockerfile
     container_name: teams-clone-backend
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     environment:
       - PORT=3001
-      - CORS_ORIGIN=http://localhost:5173
+      - CORS_ORIGIN=http://localhost:5173,http://127.0.0.1:5173
       - NODE_ENV=development
+      - JWT_SECRET=${JWT_SECRET:-}
     volumes:
-      - ./backend:/app
-      - /app/node_modules
-      - ./backend/database:/app/database
+      - teams_data:/app/data
     networks:
       - teams-clone-network
     restart: unless-stopped
@@ -28,13 +25,9 @@ services:
       dockerfile: Dockerfile
     container_name: teams-clone-frontend
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5173:5173"
     environment:
       - VITE_API_URL=http://localhost:3001
-      - VITE_SOCKET_URL=http://localhost:3001
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     networks:
       - teams-clone-network
     depends_on:
@@ -44,3 +37,6 @@ services:
 networks:
   teams-clone-network:
     driver: bridge
+
+volumes:
+  teams_data:

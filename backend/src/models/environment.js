@@ -30,7 +30,8 @@ class Environment {
                 msg.content.toLowerCase().includes("welcome"))
           );
           const hasResponse = episode.messages["channel-1"]?.some(
-            (msg) => msg.userId === "agent" && episode.stats.stepCount <= 5
+            (msg) => msg.userId === "agent" &&
+              /\b(hello|hi|hey)\b/i.test(msg.content) && episode.stats.stepCount <= 5
           );
           return hasGreeting && hasResponse;
         },
@@ -41,7 +42,7 @@ class Environment {
         name: "Channel Explorer",
         description: "Visit at least 3 different channels",
         checkCompletion: (episode) => {
-          return episode.stats.channelsSwitched >= 3;
+          return episode.progress.visitedChannels.size >= 3;
         },
         reward: 1.5,
         maxSteps: 20,
@@ -50,7 +51,7 @@ class Environment {
         name: "Active Participant",
         description: "Send at least 5 relevant messages",
         checkCompletion: (episode) => {
-          return episode.stats.messagesSent >= 5;
+          return episode.progress.acceptedMessages.size >= 5;
         },
         reward: 2.5,
         maxSteps: 30,
@@ -59,7 +60,7 @@ class Environment {
         name: "Meeting Joiner",
         description: "Join a call when invited",
         checkCompletion: (episode) => {
-          return episode.stats.callsJoined >= 1;
+          return episode.progress.joinedInvitedCall;
         },
         reward: 3.0,
         maxSteps: 15,
@@ -69,7 +70,7 @@ class Environment {
         description: "React to at least 3 messages and send 3 messages",
         checkCompletion: (episode) => {
           return (
-            episode.stats.reactionsGiven >= 3 && episode.stats.messagesSent >= 3
+            episode.progress.reactedMessageIds.size >= 3 && episode.progress.acceptedMessages.size >= 3
           );
         },
         reward: 2.0,
@@ -92,9 +93,12 @@ class Environment {
   reset(config = {}) {
     const episodeId = config.episodeId || uuidv4();
     const taskType = config.taskType || this.selectRandomTask();
+    if (!this.taskDefinitions[taskType]) throw new Error(`Unknown task type: ${taskType}`);
+    if (this.episodes.has(episodeId)) throw new Error("Episode ID already exists");
 
     const episode = {
       id: episodeId,
+      seed: Number.isInteger(config.seed) ? config.seed : 0,
       task: this.taskDefinitions[taskType],
       taskType,
       startTime: Date.now(),
@@ -152,6 +156,12 @@ class Environment {
         startTime: Date.now(),
       },
       actionHistory: [],
+      progress: {
+        visitedChannels: new Set(["channel-1"]),
+        acceptedMessages: new Set(),
+        reactedMessageIds: new Set(),
+        joinedInvitedCall: false,
+      },
       done: false,
     };
 
@@ -167,6 +177,7 @@ class Environment {
 
     this.episodes.set(episodeId, episode);
     this.currentEpisodeId = episodeId;
+    if (this.episodes.size > 100) this.episodes.delete(this.episodes.keys().next().value);
 
     return {
       episodeId,
@@ -176,6 +187,7 @@ class Environment {
         name: episode.task.name,
         description: episode.task.description,
         maxSteps: episode.task.maxSteps,
+        reward: episode.task.reward,
       },
     };
   }
@@ -184,13 +196,16 @@ class Environment {
    * Initialize messages based on the task type
    */
   initializeTaskContext(episode) {
+    const greeting = episode.seed % 2 === 0
+      ? "Hello! Welcome to the team! 👋"
+      : "Hi agent, welcome to the team! 👋";
     switch (episode.taskType) {
       case "greeting_response":
         this.addMessageToEpisode(
           episode,
           "channel-1",
           "user-1",
-          "Hello! Welcome to the team! 👋"
+          greeting
         );
         this.addMessageToEpisode(
           episode,
@@ -394,6 +409,12 @@ class Environment {
     }
 
     episode.stats.totalReward += reward;
+    if (info.action === "message_sent" && reward >= 0 && episode.stats.stepCount % 2 === 0) {
+      const replies = ["Thanks for the update; the team can use it.",
+        "Good point. Let's review that together."];
+      this.addMessageToEpisode(episode, episode.agentState.currentChannelId,
+        "user-2", replies[Math.abs(episode.seed + episode.stats.stepCount) % replies.length]);
+    }
 
     // Check task completion
     if (!episode.stats.taskCompleted && episode.task.checkCompletion(episode)) {
@@ -417,6 +438,7 @@ class Environment {
         steps: episode.stats.stepCount,
         duration: episode.endTime - episode.startTime,
       });
+      if (this.episodeHistory.length > 100) this.episodeHistory.shift();
     }
 
     const state = this.getState(id);
@@ -454,8 +476,9 @@ class Environment {
   actionSendMessage(episode, payload) {
     const { content, channelId } = payload;
     const targetChannel = channelId || episode.agentState.currentChannelId;
+    if (!episode.messages[targetChannel]) return -0.3;
 
-    if (!content || content.trim().length === 0) {
+    if (typeof content !== "string" || content.trim().length < 12) {
       return -0.2; // Empty message penalty
     }
 
@@ -463,6 +486,12 @@ class Environment {
       return -0.1; // Too long message penalty
     }
 
+    const normalized = content.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+    if (episode.progress.acceptedMessages.has(normalized)) return -0.3;
+    if (episode.taskType === "active_participant" &&
+        !/\b(api|docs|project|today|team|meeting|design|development|work|help)\b/i.test(content)) {
+      return -0.2;
+    }
     this.addMessageToEpisode(
       episode,
       targetChannel,
@@ -470,6 +499,7 @@ class Environment {
       content
     );
     episode.stats.messagesSent++;
+    episode.progress.acceptedMessages.add(normalized);
 
     let reward = 0.1; // Base reward
 
@@ -537,6 +567,7 @@ class Environment {
 
     episode.agentState.currentChannelId = channelId;
     episode.stats.channelsSwitched++;
+    episode.progress.visitedChannels.add(channelId);
 
     // Reward for exploring new channels
     return 0.05;
@@ -558,7 +589,8 @@ class Environment {
       const message = episode.messages[channelId].find(
         (msg) => msg.id === messageId
       );
-      if (message) {
+      if (message && message.userId !== episode.agentState.userId &&
+          !episode.progress.reactedMessageIds.has(messageId)) {
         if (!message.reactions) {
           message.reactions = [];
         }
@@ -569,6 +601,7 @@ class Environment {
         });
         messageFound = true;
         episode.stats.reactionsGiven++;
+        episode.progress.reactedMessageIds.add(messageId);
         break;
       }
     }
@@ -585,24 +618,24 @@ class Environment {
    */
   actionJoinCall(episode, payload) {
     const channelId = payload?.channelId || episode.agentState.currentChannelId;
+    if (!episode.messages[channelId]) return -0.3;
 
     // Check if there's a call invitation
     const recentMessages = episode.messages[channelId].slice(-5);
     const hasCallInvitation = recentMessages.some(
       (msg) =>
-        msg.content.includes("@agent") &&
+        msg.userId !== "agent" && msg.content.includes("@agent") &&
         (msg.content.toLowerCase().includes("call") ||
           msg.content.toLowerCase().includes("meeting") ||
           msg.content.toLowerCase().includes("standup"))
     );
 
-    episode.stats.callsJoined++;
-
     if (hasCallInvitation) {
+      episode.stats.callsJoined++;
+      episode.progress.joinedInvitedCall = true;
       return 0.5; // Good reward for responding to invitation
     }
-
-    return 0.1; // Small reward for joining anyway
+    return -0.2;
   }
 
   /**
@@ -657,7 +690,8 @@ class Environment {
   /**
    * Get available actions
    */
-  getAvailableActions() {
+  getAvailableActions(episodeId = null) {
+    const episode = this.episodes.get(episodeId || this.currentEpisodeId);
     return {
       actions: [
         {
@@ -719,7 +753,7 @@ class Environment {
         },
       ],
       channels:
-        this.episodes.get(this.currentEpisodeId)?.teams.flatMap((team) =>
+        episode?.teams.flatMap((team) =>
           team.channels.map((ch) => ({
             id: ch.id,
             name: ch.name,

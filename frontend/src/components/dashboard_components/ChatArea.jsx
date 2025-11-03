@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageBubble } from "./MessageBubble";
 import {
   Video,
@@ -20,14 +20,6 @@ export const ChatArea = ({ selectedChat }) => {
   const scrollRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
-  // helper: current user
-  const currentUser = React.useMemo(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user")) || null;
-    } catch {
-      return null;
-    }
-  }, []);
   const currentUserEmail = localStorage.getItem("email") || null;
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -74,14 +66,13 @@ export const ChatArea = ({ selectedChat }) => {
   // Fetch when selectedChat changes
   useEffect(() => {
     fetchMessages();
+    const poll = window.setInterval(fetchMessages, 3000);
+    return () => window.clearInterval(poll);
   }, [selectedChat, fetchMessages]);
 
   // sendMessage - posts to backend and refreshes messages
   const sendMessage = async () => {
     if (!input.trim()) return;
-    console.log(currentUserEmail)
-    console.log(token)
-    console.log(selectedChat)
     if (!currentUserEmail || !selectedChat || !token) {
       console.warn("Missing user / chat / token");
       return;

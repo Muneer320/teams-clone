@@ -25,7 +25,7 @@ export default function ActiveCall() {
   const [micEnabled, setMicEnabled] = useState(false);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
-  const [callInfo, setCallInfo] = useState(null);
+  const [, setCallInfo] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

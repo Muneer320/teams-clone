@@ -1,5 +1,5 @@
 import React from "react";
-import { MessageCircle, Video, Users, Calendar, Bell } from "lucide-react";
+import { MessageCircle, Video, Bell } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 // import { cn } from "@/lib/utils"; // for conditional class merging (if you already use cn elsewhere)
 import { cn } from "../../lib/utils";
@@ -10,8 +10,6 @@ export const Sidebar = ({ isOpen }) => {
   const navItems = [
     { icon: <MessageCircle />, label: "Chat", path: "/dashboard/chat" },
     { icon: <Video />, label: "Meet", path: "/dashboard/meet" },
-    { icon: <Users />, label: "Communities", path: "/dashboard/communities" },
-    { icon: <Calendar />, label: "Calendar", path: "/dashboard/calendar" },
     { icon: <Bell />, label: "Activity", path: "/dashboard/activity" },
   ];
 

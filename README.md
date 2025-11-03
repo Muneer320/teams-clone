@@ -1,98 +1,49 @@
-# TeamsClone-RL 🤖
+# TeamsClone task simulator
 
-A realistic Microsoft Teams clone designed as a reinforcement learning environment for training AI agents on communication and collaboration tasks.
+This repository contains a Microsoft Teams-inspired interface and a small collaboration-task simulator. The original 2025 hackathon prototype explored whether an agent could learn to navigate chats, channels and meeting invitations. The current demo has five scripted tasks, a rule-based Python baseline, and a Gymnasium adapter around the backend API. There is **no trained RL model or measured training result** in this repository. The simulator uses its own in-memory conversations; it does not control the web app's SQLite chat.
 
-## ✨ Features
+## Run the demo
 
-- 🎨 Full-featured Teams UI with real-time chat and video calls
-- 🤖 RL Environment with 5 task types and Gym-like API
-- 🔐 Authentication system with OTP verification
-- 📅 Calendar and meeting scheduling (20+ endpoints)
-- 🐳 Docker support for easy setup
-- 🐍 Python client library with baseline agents
-
-## 🚀 Quick Start
-
-### Using Docker (Recommended)
+Use Node.js 20+, Python 3.13 and npm. In one terminal:
 
 ```bash
-docker-compose up
+npm ci
+npm run install:all
+npm run dev
 ```
 
-Access at:
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001
-
-See [DOCKER_README.md](./DOCKER_README.md) for details.
-
-### Manual Setup
+The frontend opens at `http://localhost:5173`; the backend health endpoint is `http://localhost:3001/health`. In a second terminal:
 
 ```bash
-# Backend
-cd backend && npm install && npm run dev
-
-# Frontend (new terminal)
-cd frontend && npm install && npm run dev
-
-# Python Agent (optional)
-cd python_agent && pip install requests && python demo.py
+npm run demo -- --task greeting_response
+npm run demo -- --task channel_explorer
+npm run demo -- --task active_participant
+npm run demo -- --task meeting_joiner
+npm run demo -- --task social_butterfly
 ```
 
-## 🎮 RL Environment
+Each command starts a real API episode and prints the actions, rewards and completion state. The rule-based baseline completes all five tasks. For a container demo, `docker compose up --build` serves the same frontend and backend on ports 5173 and 3001, bound to localhost. Stop it with `docker compose down`; the SQLite data lives in the `teams_data` volume. Set `JWT_SECRET` in a root `.env` for Compose, or `backend/.env` for local npm runs, before running a long-lived instance. If it is omitted, the backend creates a random key at startup and previous sessions expire on restart.
 
-### Quick Example
+## What works
 
-```python
-from client import TeamsEnvClient
+- `POST /env/reset`, `POST /env/step`, `GET /env/state?episodeId=...`, task discovery and episode stats. Episodes are isolated, held in memory, and capped at 100. A seed chooses reproducible message variants and scripted replies.
+- Five tasks with validation against obvious reward shortcuts: distinct channels, substantive distinct messages, genuine greeting and meeting invitation, and reactions to distinct other-user messages.
+- A Python HTTP client and Gymnasium wrapper with a 16-value observation and 12 discrete actions. See [Python agent notes](python_agent/README.md).
+- A local React interface with account registration, sign-in, SQLite-backed direct messages, a meeting UI with local camera preview, and a per-user Activity feed. Chat refreshes every three seconds. Registration's `123456` code is explicitly a **demo-only UI step**; no email is sent. Video is a local preview; calls do not transmit media between users.
+- Backend tests, frontend lint/build, and Docker Compose. [Environment rules](docs/ENVIRONMENT.md) describe the task simulator.
 
-client = TeamsEnvClient()
-result = client.reset(task_type='greeting_response')
+## Boundaries
 
-# Send a message
-action = {'type': 'send_message', 'payload': {'content': 'Hello!'}}
-result = client.step(action, result['episodeId'])
-print(f"Reward: {result['reward']}, Done: {result['done']}")
+The simulator is separate from the app's real users and messages. The old sample episode JSON, plots, notebooks and unimplemented RL agent were removed because they implied training results that could not be reproduced. Calendar, Settings and hardcoded Communities pages were hidden from navigation. This is a local prototype; the old Vercel homepage has not been verified as a working deployment. The API uses an in-memory episode store and local SQLite, so it is suitable for one local process rather than a multi-instance service.
+
+## Checks
+
+```bash
+npm test
+npm --prefix frontend run lint
+npm --prefix frontend run build
+python -m pip install -r python_agent/requirements.txt
+python python_agent/check_env.py
 ```
 
-### 5 Task Types
-
-1. **Greeting Response** - Reply to greetings (10 steps, +2.0 reward)
-2. **Channel Explorer** - Visit 3+ channels (20 steps, +1.5 reward)
-3. **Active Participant** - Send 5+ messages (30 steps, +2.5 reward)
-4. **Meeting Joiner** - Join when invited (15 steps, +3.0 reward)
-5. **Social Butterfly** - React & message (25 steps, +2.0 reward)
-
-### Key Endpoints
-
-- `POST /env/reset` - Start new episode
-- `POST /env/step` - Execute action
-- `GET /env/state` - Get observation
-- `GET /env/tasks` - List all tasks
-
-See [RL_GUIDE.md](./docs/RL_GUIDE.md) for complete API details and reward structure.
-
-## 🛠️ Tech Stack
-
-**Frontend:** React + Vite + TailwindCSS + Socket.IO + WebRTC  
-**Backend:** Node.js + Express + Socket.IO + SQLite  
-**RL Agent:** Python + Stable-Baselines3
-
-See [DETAILS.md](./DETAILS.md) for complete tech stack and project structure.
-
-## 📚 Documentation
-
-- **[Quick Start](./QUICKSTART.md)** - 5-minute setup guide
-- **[RL Guide](./docs/RL_GUIDE.md)** - Complete RL environment guide
-- **[API Reference](./API_ENDPOINTS.md)** - All 41 endpoints
-- **[Docker Setup](./DOCKER_README.md)** - Docker instructions
-- **[Python Agent](./python_agent/README.md)** - Client library guide
-- **[Details](./DETAILS.md)** - Architecture, structure, metrics
-
-## 📝 License
-
-MIT License - Built for educational and research purposes.
-
----
-
-**🚀 Built with ❤️ for AI research**
+The browser demo can be opened directly after `npm run dev`. The API supports two-user chat; message routes require a valid bearer token and reject sender spoofing. Do not use real personal accounts or production secrets in this prototype.

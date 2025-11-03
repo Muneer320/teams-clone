@@ -20,8 +20,10 @@ class TeamsEnvClient:
         """
         self.base_url = base_url
         self.env_url = f"{base_url}/env"
+        self.episode_id = None
 
-    def reset(self, episode_id: Optional[str] = None, task_type: Optional[str] = None) -> Dict[str, Any]:
+    def reset(self, episode_id: Optional[str] = None, task_type: Optional[str] = None,
+              seed: Optional[int] = None) -> Dict[str, Any]:
         """
         Reset the environment to initial state and start a new episode.
 
@@ -40,10 +42,14 @@ class TeamsEnvClient:
             payload['episodeId'] = episode_id
         if task_type:
             payload['taskType'] = task_type
+        if seed is not None:
+            payload['seed'] = seed
 
-        response = requests.post(f"{self.env_url}/reset", json=payload)
+        response = requests.post(f"{self.env_url}/reset", json=payload, timeout=10)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        self.episode_id = data['episodeId']
+        return data
 
     def get_state(self) -> Dict[str, Any]:
         """
@@ -52,7 +58,7 @@ class TeamsEnvClient:
         Returns:
             Current state observation
         """
-        response = requests.get(f"{self.env_url}/state")
+        response = requests.get(f"{self.env_url}/state", params={'episodeId': self.episode_id}, timeout=10)
         response.raise_for_status()
         data = response.json()
         return data.get('state', {})
@@ -74,12 +80,11 @@ class TeamsEnvClient:
                 - info: Additional information
         """
         payload = {'action': action}
-        if episode_id:
-            payload['episodeId'] = episode_id
+        payload['episodeId'] = episode_id or self.episode_id
 
         response = requests.post(
             f"{self.env_url}/step",
-            json=payload
+            json=payload, timeout=10
         )
         response.raise_for_status()
         return response.json()
@@ -93,7 +98,7 @@ class TeamsEnvClient:
                 - actions: List of available action types
                 - channels: List of available channels
         """
-        response = requests.get(f"{self.env_url}/actions")
+        response = requests.get(f"{self.env_url}/actions", params={'episodeId': self.episode_id}, timeout=10)
         response.raise_for_status()
         return response.json()
 
@@ -108,10 +113,9 @@ class TeamsEnvClient:
             Statistics dictionary with stepCount, totalReward, etc.
         """
         params = {}
-        if episode_id:
-            params['episodeId'] = episode_id
+        params['episodeId'] = episode_id or self.episode_id
 
-        response = requests.get(f"{self.env_url}/stats", params=params)
+        response = requests.get(f"{self.env_url}/stats", params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
         return data.get('stats', {})
@@ -126,7 +130,7 @@ class TeamsEnvClient:
         Returns:
             Episode information dictionary
         """
-        response = requests.get(f"{self.env_url}/info/{episode_id}")
+        response = requests.get(f"{self.env_url}/info/{episode_id}", timeout=10)
         response.raise_for_status()
         data = response.json()
         return data.get('episode', {})
@@ -142,7 +146,7 @@ class TeamsEnvClient:
             List of completed episode summaries
         """
         response = requests.get(
-            f"{self.env_url}/history", params={'limit': limit})
+            f"{self.env_url}/history", params={'limit': limit}, timeout=10)
         response.raise_for_status()
         data = response.json()
         return data.get('history', [])
@@ -154,7 +158,7 @@ class TeamsEnvClient:
         Returns:
             List of task dictionaries
         """
-        response = requests.get(f"{self.env_url}/tasks")
+        response = requests.get(f"{self.env_url}/tasks", timeout=10)
         response.raise_for_status()
         data = response.json()
         return data.get('tasks', [])

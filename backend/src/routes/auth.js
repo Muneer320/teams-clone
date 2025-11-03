@@ -3,15 +3,13 @@ import { body, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { JWT_SECRET } from "../config/auth.js";
 import openDB from "../models/database.js"; // ✅ your file exports openDB() function
 
 dotenv.config();
 
 const router = express.Router();
 
-const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  "a7020ef410d0d6eb1a3dbd840240aef5d325e877b2f8ffb183e2f7a1944990df94dda60a77351f7c05b71e11384ae0e4773d237517486467ad889cb8d7fc2f11";
 
 /* ===============================
    🧩 REGISTER NEW USER

@@ -46,7 +46,7 @@ class TaskAgent:
         elif task_type == 'meeting_joiner':
             return self._meeting_joiner_policy(recent_messages, stats)
         elif task_type == 'social_butterfly':
-            return self._social_butterfly_policy(recent_messages, stats)
+            return self._social_butterfly_policy(recent_messages, stats, current_channel)
         else:
             return self._default_policy(recent_messages)
 
@@ -97,9 +97,9 @@ class TaskAgent:
 
         messages = [
             "I'm working on the RL environment today!",
-            "Great progress everyone! 🎉",
-            "Let me know if anyone needs help with their tasks",
-            "Just finished implementing the task system",
+            "Great progress on our project today! 🎉",
+            "Let me know if the team needs help with API docs",
+            "Just finished the project task system for our team",
             "Looking forward to our next team meeting"
         ]
 
@@ -151,7 +151,7 @@ class TaskAgent:
             'payload': {'content': 'Ready to join when needed'}
         }
 
-    def _social_butterfly_policy(self, recent_messages, stats):
+    def _social_butterfly_policy(self, recent_messages, stats, current_channel):
         """Policy for social butterfly task"""
         reactions_given = stats.get('reactionsGiven', 0)
         messages_sent = stats.get('messagesSent', 0)
@@ -160,7 +160,9 @@ class TaskAgent:
         if reactions_given < 3 and len(recent_messages) > 0:
             # React to a message we haven't reacted to
             for msg in reversed(recent_messages):
-                if msg['userId'] != 'agent':
+                if msg['userId'] != 'agent' and not any(
+                    item.get('userId') == 'agent' for item in msg.get('reactions', [])
+                ):
                     return {
                         'type': 'react_to_message',
                         'payload': {
@@ -168,6 +170,8 @@ class TaskAgent:
                             'reaction': ['👍', '❤️', '🎉'][reactions_given % 3]
                         }
                     }
+            if current_channel != 'channel-2':
+                return {'type': 'switch_channel', 'payload': {'channelId': 'channel-2'}}
 
         if messages_sent < 3:
             social_messages = [

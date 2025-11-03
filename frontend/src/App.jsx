@@ -45,25 +45,15 @@ function ProtectedRoute({ children, isAuthenticated }) {
 }
 
 function AppContent() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [, setToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => Boolean(localStorage.getItem("token"))
+  );
   const navigate = useNavigate();
-
-  // ✅ Check for saved token when app loads
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (savedToken) {
-      setToken(savedToken);
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   // ✅ Handle login success
   const handleAuthSuccess = (newToken) => {
-    setToken(newToken);
     setIsAuthenticated(true);
     localStorage.setItem("token", newToken);
-    console.log("Authentication successful! Token:", newToken);
 
     // Check if there's a saved redirect URL
     const redirectUrl = localStorage.getItem("redirectAfterLogin");
@@ -77,7 +67,6 @@ function AppContent() {
 
   // ✅ Handle logout
   const handleLogout = () => {
-    setToken(null);
     setIsAuthenticated(false);
     localStorage.removeItem("token");
     console.log("Logged out.");
@@ -121,6 +110,7 @@ function AppContent() {
         />
 
         {/* Protected routes */}
+        <Route path="/dashboard" element={<Navigate to="/dashboard/chat" replace />} />
         <Route
           path="/dashboard/*"
           element={

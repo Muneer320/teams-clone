@@ -3,14 +3,16 @@ Quick Demo Script for TeamsClone-RL Environment
 Runs a single episode with a rule-based agent and displays actions/rewards.
 """
 
-from task_agent import TaskAgent
-from client import TeamsEnvClient
 import sys
 import os
 import time
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 # Add python_agent to path BEFORE importing from it
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'python_agent'))
+from task_agent import TaskAgent
+from client import TeamsEnvClient
 
 # Now import from python_agent
 
@@ -51,8 +53,7 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
 
     while not done and step_count < max_steps:
         # Get current state
-        state_response = client.get_state()
-        state = state_response.get("state", {})
+        state = client.get_state()
 
         # Show state summary on first step
         if step_count == 0:
@@ -117,15 +118,16 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
     print(f"  Total Steps: {step_count}")
     print(f"  Total Reward: {total_reward:.2f}")
     print(f"  Average Reward: {total_reward/step_count:.2f}")
-    print(f"  Completed: {'✅ Yes' if done else '❌ No (timeout)'}")
+    completed = bool(info.get('taskCompleted'))
+    print(f"  Completed: {'✅ Yes' if completed else '❌ No'}")
     print("=" * 60)
 
     # Get episode stats
     try:
         stats = client.get_stats()
         print("\n📊 Environment Statistics:")
-        print(f"  Total Episodes: {stats.get('total_episodes', 0)}")
-        print(f"  Average Reward: {stats.get('avg_reward', 0):.2f}")
+        print(f"  Task Completed: {stats.get('taskCompleted', False)}")
+        print(f"  Recorded Reward: {stats.get('totalReward', 0):.2f}")
         print("=" * 60)
     except:
         pass
@@ -133,7 +135,7 @@ def run_demo(base_url="http://localhost:3001", task_type="greeting_response"):
     return {
         "total_reward": total_reward,
         "steps": step_count,
-        "completed": done
+        "completed": completed
     }
 
 
@@ -150,8 +152,8 @@ def main():
     parser.add_argument(
         "--task",
         default="greeting_response",
-        choices=["greeting_response", "meeting_setup", "channel_navigation",
-                 "message_reaction", "status_update"],
+        choices=["greeting_response", "channel_explorer", "active_participant",
+                 "meeting_joiner", "social_butterfly"],
         help="Task type to run (default: greeting_response)"
     )
 

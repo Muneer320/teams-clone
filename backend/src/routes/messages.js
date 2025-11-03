@@ -5,7 +5,7 @@ import { verifyToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // 🔒 Apply authentication middleware globally
-// router.use(verifyToken);
+router.use(verifyToken);
 
 /** Helper function to get user ID by email */
 async function getUserIdByEmail(db, email) {
@@ -23,6 +23,8 @@ router.post("/", async (req, res) => {
 
   if (!sender_email || !receiver_email || !message)
     return res.status(400).json({ success: false, error: "Missing required fields" });
+  if (sender_email !== req.user.email)
+    return res.status(403).json({ success: false, error: "Sender does not match session" });
 
   try {
     const db = await openDB();
@@ -37,6 +39,10 @@ router.post("/", async (req, res) => {
       `INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)`,
       [senderId, receiverId, message]
     );
+    await db.run(
+      `INSERT INTO activity (title, description, user_id) VALUES (?, ?, ?)`,
+      ["New message", `From ${sender_email}`, receiverId]
+    );
 
     res.json({ success: true, message: "Message sent successfully" });
   } catch (err) {
@@ -50,6 +56,8 @@ router.post("/", async (req, res) => {
 =========================== */
 router.get("/:senderEmail/:receiverEmail", async (req, res) => {
   const { senderEmail, receiverEmail } = req.params;
+  if (req.user.email !== senderEmail && req.user.email !== receiverEmail)
+    return res.status(403).json({ success: false, error: "Conversation is private" });
 
   try {
     const db = await openDB();
@@ -81,7 +89,6 @@ router.get("/:senderEmail/:receiverEmail", async (req, res) => {
       [senderId, receiverId, receiverId, senderId]
     );
 
-    console.log(messages);
 
     res.json({ success: true, messages });
   } catch (err) {
@@ -98,6 +105,8 @@ router.patch("/mark-read", async (req, res) => {
 
   if (!sender_email || !receiver_email)
     return res.status(400).json({ success: false, error: "Missing required fields" });
+  if (receiver_email !== req.user.email)
+    return res.status(403).json({ success: false, error: "Cannot mark another user's messages" });
 
   try {
     const db = await openDB();

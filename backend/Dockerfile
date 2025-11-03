@@ -1,5 +1,5 @@
 # Backend Dockerfile
-FROM node:20-alpine
+FROM node:22-trixie-slim
 
 # Set working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --omit=dev
 
 # Copy application files
 COPY . .

@@ -4,7 +4,7 @@ import { open } from "sqlite";
 import path from "path";
 import fs from "fs";
 
-// Use the same database file as initDB.js
+// One SQLite database for the local web prototype.
 const dbPath = path.resolve("./data/teams_clone.db");
 
 // Ensure database directory exists
@@ -84,15 +84,33 @@ async function initializeTables() {
         FOREIGN KEY (community_id) REFERENCES community_list(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
       );
+      CREATE TABLE IF NOT EXISTS activity (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        user_id INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sender_id INTEGER NOT NULL,
+        receiver_id INTEGER NOT NULL,
+        message TEXT NOT NULL,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        is_read INTEGER DEFAULT 0,
+        FOREIGN KEY (sender_id) REFERENCES user(id),
+        FOREIGN KEY (receiver_id) REFERENCES user(id)
+      );
     `);
 
     console.log("✅ Connected to SQLite database and tables initialized.");
   } catch (err) {
     console.error("❌ Error initializing database:", err);
+    throw err;
   }
 }
 
-initializeTables();
+export const databaseReady = initializeTables();
 
 // Default export for flexibility (still exports the same dbPromise)
 export default openDB;

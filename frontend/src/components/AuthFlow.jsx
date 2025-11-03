@@ -14,7 +14,7 @@ const API_URL = API_CONFIG.AUTH;
 // --- Main AuthFlow Component ---
 export default function AuthFlow({ onAuthSuccess }) {
   // States to manage the multi-step flow
-  const [currentStep, setCurrentStep] = useState("email"); // 'email', 'password', 'register-email', 'register-otp', 'register-details', 'forgot-password', 'forgot-otp'
+  const [currentStep, setCurrentStep] = useState("email");
   const [emailIdentifier, setEmailIdentifier] = useState(""); // Stores email/phone for login/registration
   const [password, setPassword] = useState(""); // Stores password for login/registration
   const [userName, setUserName] = useState(""); // Stores name for registration
@@ -49,7 +49,6 @@ export default function AuthFlow({ onAuthSuccess }) {
 
   // --- Handlers for authentication success ---
   const handleLoginSuccess = (token, email) => {
-    console.log(token)
     localStorage.setItem("token", token);
     localStorage.setItem("email", email);
     onAuthSuccess(token);
@@ -79,13 +78,11 @@ export default function AuthFlow({ onAuthSuccess }) {
       onBack: (step) => navigateTo(step, "right"),
       onRegisterNext: (email) => {
         setEmailIdentifier(email);
-        console.log(`Simulating OTP send to: ${email}`);
         navigateTo("register-otp");
       },
       onSwitchToLogin: () => navigateTo("email", "right"),
       onOtpVerified: () => navigateTo("register-details"),
       onRegisterSuccess: handleRegistrationSuccess,
-      onForgotPassword: () => navigateTo("forgot-password"),
     };
 
     // Render the component for the current step
@@ -110,25 +107,6 @@ export default function AuthFlow({ onAuthSuccess }) {
             {...stepProps}
             email={stepProps.emailIdentifier}
             onBack={() => stepProps.onBack("register-otp")}
-          />
-        );
-      case "forgot-password":
-        return (
-          <ForgotPasswordInput
-            {...stepProps}
-            onBack={() => stepProps.onBack("email")}
-            onNext={(email) => {
-              setEmailIdentifier(email);
-              navigateTo("forgot-otp");
-            }}
-          />
-        );
-      case "forgot-otp":
-        return (
-          <ForgotOTPInput
-            {...stepProps}
-            email={stepProps.emailIdentifier}
-            onBack={() => stepProps.onBack("forgot-password")}
           />
         );
       default:
@@ -212,7 +190,6 @@ function EmailInput({
   setEmailIdentifier,
   onNext,
   onSwitchToRegister,
-  onForgotPassword,
 }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -244,7 +221,7 @@ function EmailInput({
         {/* Heading */}
         <h2 className="text-2xl font-semibold text-center">Sign in</h2>
         <p className="text-sm text-center text-gray-400">
-          Use your Microsoft account.
+          Use your local demo account.
         </p>
 
         {error && (
@@ -262,13 +239,6 @@ function EmailInput({
               required
               autoFocus
             />
-            <button
-              type="button"
-              className="text-sm text-[#6F74D1] hover:underline inline-block"
-              onClick={onForgotPassword}
-            >
-              Forgot username?
-            </button>
           </div>
 
           {/* Next button */}
@@ -488,7 +458,7 @@ function RegisterEmailInput({
 function RegisterOTPInput({ email, onOtpVerified, onBack }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const inputRefs = [
     useRef(null),
     useRef(null),
@@ -570,7 +540,7 @@ function RegisterOTPInput({ email, onOtpVerified, onBack }) {
     setError(null);
     // Simulate resending code
     await new Promise((resolve) => setTimeout(resolve, 500));
-    alert("Code resent!");
+    alert("Demo code: 123456");
   };
 
   return (
@@ -620,7 +590,7 @@ function RegisterOTPInput({ email, onOtpVerified, onBack }) {
           Verify your email
         </h2>
         <p className="text-sm text-center text-gray-400 mb-6">
-          Enter the code we sent to your email address.
+          This prototype does not send email. Enter the demo code 123456.
         </p>
 
         {error && (
@@ -770,258 +740,6 @@ function RegisterDetailsInput({
             className="w-full bg-[#4F52B2] hover:bg-[#4144a3] text-white font-semibold py-2 rounded-md transition mt-6 disabled:opacity-50"
           >
             {loading ? "Creating account..." : "Next"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// Forgot Username Component
-function ForgotPasswordInput({ onBack, onNext }) {
-  const [emailOrPhone, setEmailOrPhone] = useState("");
-  const [usePhone, setUsePhone] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    // Simulate sending recovery code
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setLoading(false);
-    onNext(emailOrPhone);
-  };
-
-  return (
-    <div className="flex flex-col space-y-6">
-      <div>
-        {/* Header with close button and Microsoft logo */}
-        <div className="flex items-center justify-between mb-6">
-          {/* Close button */}
-          <button
-            onClick={onBack}
-            className="p-1 rounded-full hover:bg-gray-700 text-gray-300"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-
-          {/* Microsoft logo */}
-          <img
-            src={MICROSOFT_LOGO}
-            alt="Microsoft Logo"
-            className="h-10 w-auto"
-          />
-
-          {/* Spacer to keep logo centered */}
-          <div className="w-7"></div>
-        </div>
-
-        {/* Heading */}
-        <h2 className="text-2xl font-semibold text-center mb-2">
-          Recover your username
-        </h2>
-        <p className="text-sm text-center text-gray-400 mb-6">
-          Enter an email that might be associated with your Microsoft account.
-          If it matches, we'll send you a code.
-        </p>
-
-        {error && (
-          <div className="text-red-400 text-sm text-center mb-4">{error}</div>
-        )}
-
-        {/* Input field */}
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <input
-              type={usePhone ? "tel" : "email"}
-              placeholder={usePhone ? "Phone number" : "Email"}
-              className="w-full bg-transparent border border-gray-600 text-white placeholder-gray-400 px-3 py-2 rounded-md focus:ring-2 focus:ring-[#4F52B2] outline-none"
-              value={emailOrPhone}
-              onChange={(e) => setEmailOrPhone(e.target.value)}
-              required
-              autoFocus
-            />
-
-            {/* Toggle between email/phone */}
-            <button
-              type="button"
-              className="text-sm text-[#6F74D1] hover:underline inline-block"
-              onClick={() => {
-                setUsePhone(!usePhone);
-                setEmailOrPhone("");
-              }}
-            >
-              {usePhone ? "Use email instead" : "Use phone number instead"}
-            </button>
-          </div>
-
-          {/* Next button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#4F52B2] hover:bg-[#4144a3] text-white font-semibold py-2 rounded-md transition mt-6 disabled:opacity-50"
-          >
-            {loading ? "Sending..." : "Next"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// Forgot Username OTP Verification Component
-function ForgotOTPInput({ email, onBack }) {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const inputRefs = [
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-    useRef(null),
-  ];
-
-  const handleOtpChange = (index, value) => {
-    // Only allow numbers
-    if (value && !/^\d$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs[index + 1].current?.focus();
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    // Handle backspace
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs[index - 1].current?.focus();
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const otpCode = otp.join("");
-
-    if (otpCode.length !== 6) {
-      setError("Please enter all 6 digits");
-      return;
-    }
-
-    setError(null);
-    setLoading(true);
-
-    // Simulate OTP verification
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setLoading(false);
-    alert(`Username recovery successful! Code: ${otpCode}`);
-    // In a real app, display the username or navigate to success page
-  };
-
-  return (
-    <div className="flex flex-col space-y-6">
-      <div>
-        {/* Header with close button and Microsoft logo */}
-        <div className="flex items-center justify-between mb-6">
-          {/* Close button */}
-          <button
-            onClick={onBack}
-            className="p-1 rounded-full hover:bg-gray-700 text-gray-300"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-
-          {/* Microsoft logo */}
-          <img
-            src={MICROSOFT_LOGO}
-            alt="Microsoft Logo"
-            className="h-10 w-auto"
-          />
-
-          {/* Spacer to keep logo centered */}
-          <div className="w-7"></div>
-        </div>
-
-        {/* Heading */}
-        <h2 className="text-2xl font-semibold text-center mb-2">
-          Verify your email
-        </h2>
-        <p className="text-sm text-center text-gray-400 mb-6">
-          Enter the code we sent to {email}.
-        </p>
-
-        {error && (
-          <div className="text-red-400 text-sm text-center mb-4">{error}</div>
-        )}
-
-        {/* OTP Input */}
-        <form onSubmit={handleSubmit}>
-          <div className="flex justify-center gap-2 mb-6">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={inputRefs[index]}
-                type="text"
-                maxLength={1}
-                className="w-12 h-14 bg-transparent border border-gray-600 text-white text-center text-xl rounded-md focus:ring-2 focus:ring-[#4F52B2] outline-none"
-                value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                autoFocus={index === 0}
-              />
-            ))}
-          </div>
-
-          {/* Try different email link */}
-          <div className="text-center mb-6">
-            <button
-              type="button"
-              className="text-sm text-[#6F74D1] hover:underline"
-              onClick={onBack}
-            >
-              Try a different email or phone number
-            </button>
-          </div>
-
-          {/* Verify button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#4F52B2] hover:bg-[#4144a3] text-white font-semibold py-2 rounded-md transition disabled:opacity-50"
-          >
-            {loading ? "Verifying..." : "Verify"}
           </button>
         </form>
       </div>
